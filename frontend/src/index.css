@@ -518,3 +518,22 @@ h6 {
     flex-basis: calc(100vw - 120px);
   }
 }
+
+/* Story Timeline Milestone Nodes: Empty to Filled State */
+.milestone-node {
+  transition: background-color 0.1s ease-out, border-color 0.1s ease-out, box-shadow 0.15s ease-out, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.milestone-node.node-empty {
+  background-color: var(--warm-white) !important;
+  border-color: rgba(200, 150, 42, 0.4) !important;
+  box-shadow: none !important;
+  transform: scale(1) !important;
+}
+
+.milestone-node.node-filled {
+  background-color: var(--gold) !important;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 10px rgba(200, 150, 42, 0.8), 0 0 20px rgba(232, 184, 75, 0.4) !important;
+  transform: scale(1.2) !important;
+}
