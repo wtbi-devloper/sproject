@@ -53,69 +53,64 @@ export default function StoryPreview() {
 
     if (totalItems <= 1) {
       // Fallback: show only the first item statically
-      gsap.set(".desktop-text:not(.item-0)", { opacity: 0, zIndex: 0 });
-      gsap.set(".desktop-img:not(.item-0)", { opacity: 0, zIndex: 0 });
-      gsap.set(".desktop-text.item-0", { opacity: 1, zIndex: 10 });
-      gsap.set(".desktop-img.item-0", { opacity: 1, zIndex: 10 });
-      gsap.set(".progress-fill", { height: "100%" });
+      gsap.set('.desktop-text:not(.item-0)', { opacity: 0, zIndex: 0 });
+      gsap.set('.desktop-img:not(.item-0)', { opacity: 0, zIndex: 0 });
+      gsap.set('.desktop-text.item-0', { opacity: 1, zIndex: 10 });
+      gsap.set('.desktop-img.item-0', { opacity: 1, zIndex: 10 });
+      gsap.set('.progress-fill', { height: '100%' });
       return;
     }
 
     // Reset states initially
-    gsap.set(".desktop-text", { zIndex: 0 });
-    gsap.set(".desktop-text:not(.item-0) .desktop-text-elem", { opacity: 0, y: 30 });
+    gsap.set('.desktop-text', { zIndex: 0 });
+    gsap.set('.desktop-text:not(.item-0) .desktop-text-elem', { opacity: 0, y: 30 });
+    gsap.set('.desktop-img:not(.item-0)', { opacity: 0, z: -100, rotateX: -10, y: 100, zIndex: 0 });
+    gsap.set('.desktop-text.item-0', { zIndex: 10 });
+    gsap.set('.desktop-text.item-0 .desktop-text-elem', { opacity: 1, y: 0 });
+    gsap.set('.desktop-img.item-0', { opacity: 1, z: 0, rotateX: 0, y: 0, scale: 1, zIndex: 10 });
+    gsap.set('.progress-fill', { height: '0%' });
 
-    gsap.set(".desktop-img:not(.item-0)", { opacity: 0, z: -100, rotateX: -10, y: 100, zIndex: 0 });
-
-    gsap.set(".desktop-text.item-0", { zIndex: 10 });
-    gsap.set(".desktop-text.item-0 .desktop-text-elem", { opacity: 1, y: 0 });
-    gsap.set(".desktop-img.item-0", { opacity: 1, z: 0, rotateX: 0, y: 0, scale: 1, zIndex: 10 });
-    gsap.set(".progress-fill", { height: "0%" });
+    // ── Per-item scroll distance: 50vh (snappy, not a slog) ──────────────────
+    const SCROLL_PER_ITEM = 50; // percent of container height per story item
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: desktopContainerRef.current,
-        start: "top top",
-        end: `+=${totalItems * 80}%`, // Reduced scroll distance
+        start: 'top top',
+        end: `+=${totalItems * SCROLL_PER_ITEM}%`,
         pin: true,
         scrub: 1,
         anticipatePin: 1,
         refreshPriority: 1,
         invalidateOnRefresh: true,
-      }
+      },
     });
 
-    // Animate progress bar in parallel with the pinned scroll
-    gsap.to(".progress-fill", {
-      height: "100%",
-      ease: "none",
+    // Progress bar tracks the same scroll window
+    gsap.to('.progress-fill', {
+      height: '100%',
+      ease: 'none',
       scrollTrigger: {
         trigger: desktopContainerRef.current,
-        start: "top top",
-        end: `+=${totalItems * 80}%`,
+        start: 'top top',
+        end: `+=${totalItems * SCROLL_PER_ITEM}%`,
         scrub: true,
-      }
+      },
     });
 
     items.forEach((_, i) => {
       if (i !== 0) {
         tl.to({}, { duration: 1 }) // Hold previous item on screen
-
-          // Fade out previous
-          .to(`.desktop-text.item-${i - 1} .desktop-text-elem`, { opacity: 0, y: -30, duration: 0.5, stagger: 0.1, ease: "power2.in" })
-          .to(`.desktop-img.item-${i - 1}`, { opacity: 0, z: -50, rotateX: 10, y: -50, zIndex: 0, duration: 0.8, ease: "power2.inOut" }, "<")
-
-          // Set z-indexes
-          .set(`.desktop-text.item-${i}`, { zIndex: 10 }, "<0.4")
-          .set(`.desktop-img.item-${i}`, { zIndex: 10 }, "<0.4")
-
-          // Fade in current
-          .to(`.desktop-text.item-${i} .desktop-text-elem`, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "<0.2")
-          .to(`.desktop-img.item-${i}`, { opacity: 1, z: 0, rotateX: 0, y: 0, duration: 1, ease: "power3.out" }, "<");
+          .to(`.desktop-text.item-${i - 1} .desktop-text-elem`, { opacity: 0, y: -30, duration: 0.5, stagger: 0.1, ease: 'power2.in' })
+          .to(`.desktop-img.item-${i - 1}`, { opacity: 0, z: -50, rotateX: 10, y: -50, zIndex: 0, duration: 0.8, ease: 'power2.inOut' }, '<')
+          .set(`.desktop-text.item-${i}`, { zIndex: 10 }, '<0.4')
+          .set(`.desktop-img.item-${i}`, { zIndex: 10 }, '<0.4')
+          .to(`.desktop-text.item-${i} .desktop-text-elem`, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out' }, '<0.2')
+          .to(`.desktop-img.item-${i}`, { opacity: 1, z: 0, rotateX: 0, y: 0, duration: 1, ease: 'power3.out' }, '<');
       }
     });
 
-    // Final pause so the last item stays on screen briefly before unpinning
+    // Final pause so the last item stays on screen before unpinning
     tl.to({}, { duration: 1 });
   }, { scope: sectionRef, dependencies: [items.length, loading] });
 
@@ -138,7 +133,7 @@ export default function StoryPreview() {
       ) : (
         <>
           {/* RESPONSIVE PINNED COMPOSITION */}
-          <div ref={desktopContainerRef} className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-[var(--cream)] relative pt-24 pb-6 lg:pt-0 lg:pb-0 justify-center lg:justify-start gap-6 sm:gap-8 lg:gap-0">
+          <div ref={desktopContainerRef} className="flex flex-col lg:flex-row h-[100dvh] w-full overflow-hidden bg-[var(--cream)] relative pt-24 pb-6 lg:pt-0 lg:pb-0 justify-center lg:justify-start gap-6 sm:gap-8 lg:gap-0">
 
             {/* Header Overlay */}
             <div className="relative lg:absolute lg:top-12 lg:left-12 z-20 xl:top-16 xl:left-16 px-6 lg:px-0 shrink-0">

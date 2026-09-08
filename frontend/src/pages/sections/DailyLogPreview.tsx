@@ -57,36 +57,37 @@ export default function DailyLogPreview() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: "top top",
-        end: () => `+=${getScrollAmount()}`, 
+        start: 'top top',
+        end: () => `+=${getScrollAmount()}`,
         pin: true,
         scrub: 1,
         refreshPriority: 0,
         invalidateOnRefresh: true,
-      }
+      },
     });
 
     tl.to(track, {
       x: () => -getScrollAmount(),
-      ease: "none",
+      ease: 'none',
     });
 
-    // Slight scale effect on cards as they scroll
-    gsap.utils.toArray<HTMLElement>(".log-card-wrapper").forEach((card) => {
-      gsap.fromTo(card, 
+    // Slight scale effect on cards as they scroll into view
+    gsap.utils.toArray<HTMLElement>('.log-card-wrapper').forEach((card) => {
+      gsap.fromTo(
+        card,
         { scale: 0.9, opacity: 0.5 },
-        { 
-          scale: 1, 
-          opacity: 1, 
-          ease: "power2.out",
+        {
+          scale: 1,
+          opacity: 1,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: card,
             containerAnimation: tl,
-            start: "left 80%",
-            end: "left 20%",
+            start: 'left 80%',
+            end: 'left 20%',
             scrub: true,
-          }
-        }
+          },
+        },
       );
     });
   }, [loading, items.length]);

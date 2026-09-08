@@ -6,6 +6,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const setHeroNavbarTheme = (isLight: boolean) => {
+  document.documentElement.dataset.heroNavbarTheme = isLight ? 'light' : 'dark';
+  window.dispatchEvent(new CustomEvent('hero-theme-change', { detail: { isLight } }));
+};
 import {
   HERO_BADGE,
   HERO_DESCRIPTION,
@@ -107,6 +112,10 @@ export default function HeroSection() {
           anticipatePin: 1,
           refreshPriority: 2,
           invalidateOnRefresh: true,
+          // Navbar follows this trigger rather than reproducing its scroll math.
+          onEnter: () => setHeroNavbarTheme(false),
+          onLeave: () => setHeroNavbarTheme(true),
+          onEnterBack: () => setHeroNavbarTheme(false),
           onUpdate: (self) => {
             if (videoRef.current) {
               const video = videoRef.current;
@@ -193,7 +202,7 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={container}
-      className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-[var(--brown)]"
+      className="relative flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden bg-[var(--brown)]"
     >
       {/* Background Video */}
       <div className="absolute inset-0 z-0 h-full w-full overflow-hidden bg-[var(--brown)]">
@@ -252,7 +261,7 @@ export default function HeroSection() {
           </h1>
 
           {/* Bouncing Arrow Indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex animate-bounce flex-col items-center justify-center">
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex animate-bounce flex-col items-center justify-center">
             <span className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/50">Scroll</span>
             <ChevronDown className="h-6 w-6 text-[var(--gold)]/80" strokeWidth={2} />
           </div>
@@ -273,7 +282,7 @@ export default function HeroSection() {
       </div>
 
       {/* 3. BOTTOM CENTER (Mobile) / BOTTOM RIGHT (Desktop): Transparent Button */}
-      <div className="absolute bottom-12 left-1/2 z-20 -translate-x-1/2 lg:bottom-24 lg:left-auto lg:right-24 lg:translate-x-0">
+      <div className="absolute bottom-16 left-1/2 z-20 -translate-x-1/2 lg:bottom-24 lg:left-auto lg:right-24 lg:translate-x-0">
         <NavLink
           to={PRIMARY_CTA_LINK}
           className="hero-btn group relative flex items-center justify-center whitespace-nowrap rounded-full border border-white/50 bg-transparent px-8 py-4 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-white hover:bg-white/10"
@@ -284,7 +293,7 @@ export default function HeroSection() {
       </div>
 
       {/* 4. BOTTOM CENTER (Mobile) / BOTTOM LEFT (Desktop): Main Title & Badge */}
-      <div className="absolute bottom-32 left-1/2 z-20 flex w-full -translate-x-1/2 flex-col items-center px-4 text-center lg:bottom-24 lg:left-24 lg:w-auto lg:translate-x-0 lg:items-start lg:px-0 lg:text-left">
+      <div className="absolute bottom-36 left-1/2 z-20 flex w-full -translate-x-1/2 flex-col items-center px-4 text-center lg:bottom-24 lg:left-24 lg:w-auto lg:translate-x-0 lg:items-start lg:px-0 lg:text-left">
         <h2 className="mb-6 font-['Playfair_Display'] text-5xl leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
           <div className="hero-elem hero-title-line overflow-hidden opacity-0">
             Be Believers,

@@ -8,10 +8,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => {
     if (typeof window === 'undefined') return false;
-    const isHomePath = window.location.pathname === '/';
-    // Hero is pinned for 400% (500vh total), so we transition at 4.9 viewport heights
-    const threshold = isHomePath ? window.innerHeight * 4.9 : 10;
-    return window.scrollY > threshold;
+    return window.location.pathname !== '/' && window.scrollY > 10;
   });
   
   const { scrollY } = useScroll();
@@ -21,22 +18,38 @@ export default function Navbar() {
   const isConnect = location.pathname === '/page/connect';
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
-    const threshold = isHome ? window.innerHeight * 4.9 : 20;
-    const isScrolled = latest > threshold;
+    if (isHome) return;
+
+    const isScrolled = latest > 20;
     if (scrolled !== isScrolled) {
       setScrolled(isScrolled);
     }
   });
 
-  // Close mobile menu on escape and handle resize
+  // The hero owns its pin duration, so it also signals precisely when its visual
+  // treatment ends. This keeps the navbar theme in sync if that duration changes.
+  useEffect(() => {
+    if (!isHome) return;
+
+    const handleHeroThemeChange = (event: Event) => {
+      setScrolled((event as CustomEvent<{ isLight: boolean }>).detail.isLight);
+    };
+
+    setScrolled(document.documentElement.dataset.heroNavbarTheme === 'light');
+    window.addEventListener('hero-theme-change', handleHeroThemeChange);
+    return () => window.removeEventListener('hero-theme-change', handleHeroThemeChange);
+  }, [isHome]);
+
+  // Close mobile menu on escape and keep non-home scroll styling responsive.
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMobileOpen(false);
     };
     
     const handleResize = () => {
-      const threshold = isHome ? window.innerHeight * 4.9 : 20;
-      const isScrolled = window.scrollY > threshold;
+      if (isHome) return;
+
+      const isScrolled = window.scrollY > 20;
       if (scrolled !== isScrolled) {
         setScrolled(isScrolled);
       }
