@@ -107,7 +107,7 @@ export default function Footer() {
 
           {/* Bottom bar */}
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-[var(--cream)]/10 pt-6 sm:flex-row">
-            <p className="text-sm text-[var(--cream)]/40">
+            <p className="text-sm text-[var(--cream)]/40 text-center sm:text-left">
               {FOOTER_TEXT}
             </p>
             <button

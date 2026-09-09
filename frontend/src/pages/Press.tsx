@@ -25,7 +25,7 @@ function PressCard({ item, index }: { item: PressItem; index: number }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="block group relative flex flex-col overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
+      className="group relative flex flex-col h-full overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
       style={{
         backgroundColor: 'white',
         border: '1px solid rgba(44,26,14,0.07)',
@@ -34,58 +34,66 @@ function PressCard({ item, index }: { item: PressItem; index: number }) {
         textDecoration: 'none',
       }}
     >
-      {/* Image */}
-      {hasImage && (
-        <div className="relative h-48 w-full overflow-hidden">
-          <OptimizedImage
-            src={item.images![0]}
-            blurSrc={item.imageBlurUrls?.[0]}
-            alt={item.title}
-            fit="cover"
-            loading="lazy"
-            imgClassName="h-full w-full transition-transform duration-500 group-hover:scale-105"
-          />
-          <div
-            className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{ background: 'linear-gradient(to top, rgba(200,150,42,0.15) 0%, transparent 60%)' }}
-          />
-        </div>
-      )}
+      {/* Image Banner (with uniform height & fallback) */}
+      <div className="relative h-48 w-full overflow-hidden shrink-0 bg-[var(--cream)]">
+        {hasImage ? (
+          <>
+            <OptimizedImage
+              src={item.images![0]}
+              blurSrc={item.imageBlurUrls?.[0]}
+              alt={item.title}
+              fit="cover"
+              loading="lazy"
+              imgClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div
+              className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              style={{ background: 'linear-gradient(to top, rgba(200,150,42,0.15) 0%, transparent 60%)' }}
+            />
+          </>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--cream)] via-[var(--card-bg)] to-[var(--cream)]">
+            <Newspaper className="h-12 w-12 text-[var(--gold)]/30" />
+          </div>
+        )}
+      </div>
 
-      <div className="flex flex-1 flex-col p-6">
-        {/* Outlet + Year */}
-        <div className="mb-3 flex items-center justify-between">
-          <span
-            className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]"
+      <div className="flex flex-1 flex-col p-6 justify-between">
+        <div>
+          {/* Outlet + Year */}
+          <div className="mb-3 flex items-center justify-between">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]"
+              style={{
+                backgroundColor: 'rgba(200,150,42,0.08)',
+                color: 'var(--gold)',
+                border: '1px solid rgba(200,150,42,0.2)',
+              }}
+            >
+              <Newspaper className="h-3 w-3" />
+              {item.outlet}
+            </span>
+            <span className="text-xs font-bold" style={{ color: 'var(--muted)' }}>
+              {item.year}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h3
+            className="font-bold leading-snug transition-colors duration-200 group-hover:text-[var(--gold)] line-clamp-3"
             style={{
-              backgroundColor: 'rgba(200,150,42,0.08)',
-              color: 'var(--gold)',
-              border: '1px solid rgba(200,150,42,0.2)',
+              fontFamily: "'Playfair Display', serif",
+              fontSize: '1.05rem',
+              color: 'var(--brown)',
             }}
           >
-            <Newspaper className="h-3 w-3" />
-            {item.outlet}
-          </span>
-          <span className="text-xs font-bold" style={{ color: 'var(--muted)' }}>
-            {item.year}
-          </span>
+            {item.title}
+          </h3>
         </div>
-
-        {/* Title */}
-        <h3
-          className="flex-1 font-bold leading-snug transition-colors duration-200 group-hover:text-[var(--gold)]"
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: '1.05rem',
-            color: 'var(--brown)',
-          }}
-        >
-          {item.title}
-        </h3>
 
         {/* View Details hint */}
         <div
-          className="mt-4 flex items-center gap-2 pt-4"
+          className="mt-5 flex items-center gap-2 pt-4"
           style={{ borderTop: '1px solid rgba(44,26,14,0.05)' }}
         >
           <span

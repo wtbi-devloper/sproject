@@ -107,7 +107,7 @@ export default function DailyLogPreview() {
           </div>
           <NavLink
             to="/page/daily-log"
-            className="group hidden lg:inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--gold)] to-[var(--gold-light)] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[var(--gold)]/20 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[var(--gold)]/30"
+            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--gold)] to-[var(--gold-light)] px-5 py-2 sm:px-6 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-[var(--gold)]/20 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[var(--gold)]/30 shrink-0 self-start sm:self-auto"
           >
             View All Entries
             <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
@@ -118,7 +118,7 @@ export default function DailyLogPreview() {
       {loading ? (
         <div className="mx-auto max-w-7xl px-6 mt-8 flex flex-row items-stretch gap-6 lg:gap-8 lg:mt-8 w-max">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="skeleton h-[460px] sm:h-[500px] w-[340px] sm:w-[400px] rounded-[2rem]" />
+            <div key={i} className="skeleton h-[450px] sm:h-[500px] w-[84vw] max-w-[360px] sm:w-[400px] sm:max-w-none rounded-[2rem]" />
           ))}
         </div>
       ) : (
@@ -145,7 +145,7 @@ export default function DailyLogPreview() {
             ))}
 
             {/* View All Card at the end of scroll */}
-            <div className="log-card-wrapper flex h-[460px] sm:h-[500px] w-[340px] sm:w-[400px] shrink-0 flex-col items-center justify-center rounded-[2rem] border-2 border-dashed border-[var(--gold)]/30 bg-[var(--gold)]/5 p-8 text-center transition-all duration-500 hover:border-[var(--gold)] hover:bg-[var(--gold)]/10 hover:-translate-y-1">
+            <div className="log-card-wrapper flex h-[450px] sm:h-[500px] w-[84vw] max-w-[360px] sm:w-[400px] sm:max-w-none shrink-0 flex-col items-center justify-center rounded-[2rem] border-2 border-dashed border-[var(--gold)]/30 bg-[var(--gold)]/5 p-8 text-center transition-all duration-500 hover:border-[var(--gold)] hover:bg-[var(--gold)]/10 hover:-translate-y-1">
               <div className="mb-6 rounded-full bg-[var(--gold)] p-5 text-white shadow-xl shadow-[var(--gold)]/20">
                 <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />

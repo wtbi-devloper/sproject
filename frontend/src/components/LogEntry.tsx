@@ -166,7 +166,7 @@ export default function LogEntry({
       </div>
     );
 
-    const cardClasses = "group relative block h-[460px] sm:h-[500px] w-[340px] sm:w-[400px] shrink-0 overflow-hidden rounded-[2rem] bg-white/90 shadow-xl shadow-[var(--brown)]/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--brown)]/10";
+    const cardClasses = "group relative block h-[450px] sm:h-[500px] w-[84vw] max-w-[360px] sm:w-[400px] sm:max-w-none shrink-0 overflow-hidden rounded-[2rem] bg-white/90 shadow-xl shadow-[var(--brown)]/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--brown)]/10";
 
     if (detailLink) {
       return (

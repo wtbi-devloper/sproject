@@ -151,14 +151,14 @@ export default function PressDetail() {
   }
 
   return (
-    <SectionPageShell kicker="Press & Media" title={item.title} subtitle="">
+    <SectionPageShell kicker="Press & Media" title={item.title} subtitle={`${item.outlet} · ${item.year}`}>
       <div className="w-full space-y-8">
         {/* Back */}
-        <NavLink to="/page/press" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: 'var(--gold)' }}>
+        <NavLink to="/page/press" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--gold)' }}>
           ← Back to Press
         </NavLink>
 
-        {/* Outlet + Year + View Article CTA */}
+        {/* Outlet Meta Bar + View Article CTA */}
         <div
           className="flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6"
           style={{ backgroundColor: 'white', border: '1px solid rgba(44,26,14,0.08)', boxShadow: '0 2px 12px rgba(44,26,14,0.04)' }}
@@ -166,24 +166,21 @@ export default function PressDetail() {
           <div className="flex items-center gap-4">
             {/* Outlet icon */}
             <div
-              className="flex h-14 w-14 items-center justify-center rounded-2xl"
+              className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl shrink-0"
               style={{
                 background: 'linear-gradient(135deg, rgba(200,150,42,0.08) 0%, rgba(232,184,75,0.15) 100%)',
                 border: '1px solid rgba(200,150,42,0.25)',
               }}
             >
-              <Newspaper className="h-7 w-7" style={{ color: 'var(--gold)' }} />
+              <Newspaper className="h-6 w-6 text-[var(--gold)]" />
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: 'var(--gold)' }}>
-                {item.outlet} · {item.year}
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--gold)]">
+                Published Outlet
               </p>
-              <h2
-                className="mt-1 text-xl font-bold leading-snug"
-                style={{ fontFamily: "'Playfair Display', serif", color: 'var(--brown)' }}
-              >
-                {item.title}
-              </h2>
+              <p className="mt-0.5 text-base sm:text-lg font-bold text-[var(--brown)]">
+                {item.outlet} ({item.year})
+              </p>
             </div>
           </div>
 
@@ -193,16 +190,14 @@ export default function PressDetail() {
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 rounded-2xl px-6 py-3 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 background: 'linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%)',
                 boxShadow: '0 4px 16px rgba(200,150,42,0.35)',
               }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 8px 24px rgba(200,150,42,0.5)')}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 4px 16px rgba(200,150,42,0.35)')}
             >
               <ExternalLink className="h-4 w-4" />
-              View Article
+              Read Original Article
             </a>
           )}
         </div>

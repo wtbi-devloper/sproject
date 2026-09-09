@@ -203,7 +203,7 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
             className={`relative z-50 border-t md:hidden overflow-hidden ${dropdownBorder}`}
           >
-            <div className="flex flex-col gap-1 px-6 py-4">
+            <div className="flex flex-col gap-1 px-6 py-4 max-h-[calc(100dvh-6rem)] overflow-y-auto">
               {NAV_ITEMS.map((item, i) => (
                 <motion.div
                   key={item.sectionId}

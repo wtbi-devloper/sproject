@@ -130,7 +130,7 @@ export default function DailyLog() {
   );
 
   return (
-    <div ref={mainRef} className="min-h-screen bg-[var(--warm-white)] pt-24 lg:pt-32 pb-24">
+    <div ref={mainRef} className="min-h-screen bg-[var(--warm-white)] pt-24 sm:pt-28 lg:pt-32 pb-24">
       {/* Bespoke Hero Section */}
       <section className="relative px-6 pb-12 lg:pb-16 max-w-7xl mx-auto">
         <div className="relative z-10 flex flex-col items-start text-left max-w-3xl">

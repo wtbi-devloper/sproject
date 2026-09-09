@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 export default function NotFound() {
   return (
-    <div className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-6 text-center">
+    <div className="relative flex min-h-[calc(100vh-140px)] flex-col items-center justify-center overflow-hidden px-6 pt-24 sm:pt-28 lg:pt-32 pb-20 text-center">
       {/* Background decorations */}
       <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-[var(--gold)]/5 blur-3xl" />
       <div className="absolute bottom-1/4 right-1/4 h-48 w-48 rounded-full bg-[var(--gold)]/3 blur-3xl" />

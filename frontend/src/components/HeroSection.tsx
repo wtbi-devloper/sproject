@@ -269,8 +269,8 @@ export default function HeroSection() {
       </div>
 
       {/* 2. TOP CENTER (Mobile) / TOP RIGHT (Desktop): True Scroll-Driven Typewriter */}
-      <div className="absolute top-24 left-1/2 z-20 w-[90%] max-w-[340px] -translate-x-1/2 text-center lg:left-auto lg:right-24 lg:top-32 lg:w-[420px] lg:translate-x-0 lg:text-left xl:w-[500px]">
-        <p className="font-['Playfair_Display'] text-2xl leading-snug text-white sm:text-3xl lg:text-4xl">
+      <div className="absolute top-20 sm:top-24 left-1/2 z-20 w-[90%] max-w-[340px] -translate-x-1/2 text-center lg:left-auto lg:right-24 lg:top-32 lg:w-[420px] lg:translate-x-0 lg:text-left xl:w-[500px]">
+        <p className="font-['Playfair_Display'] text-xl leading-snug text-white sm:text-3xl lg:text-4xl">
           {HERO_DESCRIPTION.split("").map((char, i) => (
             <span key={i} className="hero-desc-char hidden">
               {char}
@@ -282,10 +282,10 @@ export default function HeroSection() {
       </div>
 
       {/* 3. BOTTOM CENTER (Mobile) / BOTTOM RIGHT (Desktop): Transparent Button */}
-      <div className="absolute bottom-16 left-1/2 z-20 -translate-x-1/2 lg:bottom-24 lg:left-auto lg:right-24 lg:translate-x-0">
+      <div className="absolute bottom-10 sm:bottom-16 left-1/2 z-20 -translate-x-1/2 lg:bottom-24 lg:left-auto lg:right-24 lg:translate-x-0">
         <NavLink
           to={PRIMARY_CTA_LINK}
-          className="hero-btn group relative flex items-center justify-center whitespace-nowrap rounded-full border border-white/50 bg-transparent px-8 py-4 text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-white hover:bg-white/10"
+          className="hero-btn group relative flex items-center justify-center whitespace-nowrap rounded-full border border-white/50 bg-transparent px-7 py-3 sm:px-8 sm:py-4 text-xs sm:text-sm font-semibold text-white backdrop-blur-md transition-all hover:border-white hover:bg-white/10"
         >
           <span className="relative z-10 text-xs uppercase tracking-widest">Know More</span>
           <span className="relative z-10 ml-3 transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -293,8 +293,8 @@ export default function HeroSection() {
       </div>
 
       {/* 4. BOTTOM CENTER (Mobile) / BOTTOM LEFT (Desktop): Main Title & Badge */}
-      <div className="absolute bottom-36 left-1/2 z-20 flex w-full -translate-x-1/2 flex-col items-center px-4 text-center lg:bottom-24 lg:left-24 lg:w-auto lg:translate-x-0 lg:items-start lg:px-0 lg:text-left">
-        <h2 className="mb-6 font-['Playfair_Display'] text-5xl leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
+      <div className="absolute bottom-28 sm:bottom-36 left-1/2 z-20 flex w-full -translate-x-1/2 flex-col items-center px-4 text-center lg:bottom-24 lg:left-24 lg:w-auto lg:translate-x-0 lg:items-start lg:px-0 lg:text-left">
+        <h2 className="mb-4 sm:mb-6 font-['Playfair_Display'] text-4xl leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
           <div className="hero-elem hero-title-line overflow-hidden opacity-0">
             Be Believers,
           </div>
@@ -303,7 +303,7 @@ export default function HeroSection() {
           </div>
         </h2>
         <div className="hero-elem hero-badge inline-flex items-center text-xs font-semibold uppercase tracking-widest text-white/80 opacity-0 sm:text-sm">
-          <span className="mr-4 hidden h-[2px] w-8 bg-[var(--gold)] lg:inline-block" />
+          <span className="mr-3 inline-block h-[2px] w-6 bg-[var(--gold)] sm:mr-4 sm:w-8" />
           {HERO_BADGE}
         </div>
       </div>

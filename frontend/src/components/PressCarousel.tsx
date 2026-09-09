@@ -330,25 +330,19 @@ export default function PressCarousel({ items }: PressCarouselProps) {
       onKeyDown={handleKeyDown}
     >
       <div className="mx-auto max-w-7xl px-6 mb-10 sm:mb-14">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div
-              className="inline-flex items-center gap-2 text-sm font-semibold"
-              style={{ color: 'var(--gold)' }}
-            >
-              <span className="inline-block h-px w-6" style={{ background: 'var(--gold)' }} />
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
+              <span className="inline-block h-px w-6 bg-[var(--gold)]" />
               Press &amp; Media
             </div>
-            <h2
-              className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-              style={{ fontFamily: "'Playfair Display', serif", color: 'var(--brown)' }}
-            >
+            <h2 className="mt-3 font-['Playfair_Display'] text-3xl font-bold tracking-tight text-[var(--brown)] sm:text-4xl lg:text-5xl">
               In the News
             </h2>
           </div>
-          <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto mt-4 sm:mt-0">
+          <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto mt-2 sm:mt-0">
             {count > 1 && (
-              <div className="flex items-center gap-2.5" role="tablist" aria-label="Press items">
+              <div className="flex items-center gap-2" role="tablist" aria-label="Press items">
                 {items.map((item, i) => (
                   <button
                     key={item._id}
@@ -359,8 +353,8 @@ export default function PressCarousel({ items }: PressCarouselProps) {
                     onClick={() => jumpTo(i)}
                     className="rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
-                      width: i === activeIdx ? '1.75rem' : '0.5rem',
-                      height: '0.5rem',
+                      width: i === activeIdx ? '1.5rem' : '0.45rem',
+                      height: '0.45rem',
                       background: i === activeIdx ? 'var(--gold)' : 'var(--muted)',
                       opacity: i === activeIdx ? 1 : 0.35,
                       border: 'none',
@@ -373,10 +367,9 @@ export default function PressCarousel({ items }: PressCarouselProps) {
             )}
             <NavLink
               to="/page/press"
-              className="group inline-flex items-center gap-1.5 text-sm font-semibold transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:rounded shrink-0"
-              style={{ color: 'var(--gold)' }}
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[var(--gold)] to-[var(--gold-light)] px-5 py-2 sm:px-6 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-[var(--gold)]/20 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[var(--gold)]/30 shrink-0"
             >
-              View all
+              View All Coverage
               <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
             </NavLink>
           </div>

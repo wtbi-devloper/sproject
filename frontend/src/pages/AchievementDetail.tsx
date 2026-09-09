@@ -151,17 +151,20 @@ export default function AchievementDetail() {
   }
 
   return (
-    <SectionPageShell kicker="Achievements" title={item.title} subtitle="">
+    <SectionPageShell kicker="Achievements" title={item.title} subtitle={`Honors & Recognition Archive · ${item.year}`}>
       <div className="w-full space-y-8">
         {/* Back */}
-        <NavLink to="/page/achievements" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: 'var(--gold)' }}>
+        <NavLink to="/page/achievements" className="inline-flex items-center gap-2 text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--gold)' }}>
           ← Back to Achievements
         </NavLink>
 
-        {/* Icon + Year header */}
-        <div className="flex items-center gap-5">
+        {/* Milestone Recognition Bar */}
+        <div
+          className="flex items-center gap-5 rounded-3xl p-6"
+          style={{ backgroundColor: 'white', border: '1px solid rgba(44,26,14,0.08)', boxShadow: '0 2px 12px rgba(44,26,14,0.04)' }}
+        >
           <div
-            className="flex h-20 w-20 items-center justify-center rounded-2xl text-4xl shadow-inner"
+            className="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl shadow-inner shrink-0"
             style={{
               background: 'linear-gradient(135deg, rgba(200,150,42,0.08) 0%, rgba(232,184,75,0.15) 100%)',
               border: '1px solid rgba(200,150,42,0.25)',
@@ -171,12 +174,12 @@ export default function AchievementDetail() {
             {item.icon || '🏆'}
           </div>
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: 'var(--gold)' }}>
-              {item.year}
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--gold)]">
+              Conferred in {item.year}
             </p>
-            <h2 className="mt-1 text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif", color: 'var(--brown)' }}>
-              {item.title}
-            </h2>
+            <p className="mt-0.5 text-base sm:text-lg font-bold text-[var(--brown)]">
+              Official Milestone Achievement
+            </p>
           </div>
         </div>
 

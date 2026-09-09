@@ -365,7 +365,7 @@ export default function Story() {
   return (
     <div
       ref={pageRef}
-      className="relative min-h-screen overflow-x-hidden bg-[var(--warm-white)] text-[var(--brown)]"
+      className="relative min-h-screen overflow-x-hidden bg-[var(--warm-white)] text-[var(--brown)] pt-24 sm:pt-28 lg:pt-32 pb-24"
     >
       {/* ===== LUXURY AMBIENT BACKGROUND LIGHTING ===== */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
@@ -375,7 +375,7 @@ export default function Story() {
       </div>
 
       {/* ===== BESPOKE HERO HEADER ===== */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 pb-8 pt-24 sm:pb-12 sm:pt-28 lg:pt-32">
+      <section className="relative z-10 mx-auto max-w-7xl px-6 pb-12 lg:pb-16">
         <div className="flex flex-col items-start text-left max-w-3xl">
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
             <span className="inline-block h-px w-6 bg-[var(--gold)]" />
@@ -392,7 +392,7 @@ export default function Story() {
       </section>
 
       {/* ===== MAIN TIMELINE SECTION ===== */}
-      <main className="relative z-10 mx-auto max-w-6xl px-4 pb-24 sm:px-6 lg:pb-32">
+      <main className="relative z-10 mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:pb-32">
         {loading ? (
           <div className="space-y-16">
             {[1, 2, 3].map((i) => (
