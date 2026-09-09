@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
-import { X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import apiClient from '../api/client';
 import OptimizedImage from '../components/OptimizedImage';
+import LightboxModal from '../components/LightboxModal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -137,26 +138,6 @@ export default function Story() {
 
   const openLightbox = (images: string[], index: number) => setLightbox({ images, index });
   const closeLightbox = () => setLightbox(null);
-  const prevImage = () =>
-    setLightbox((lb) =>
-      lb ? { ...lb, index: (lb.index - 1 + lb.images.length) % lb.images.length } : null
-    );
-  const nextImage = () =>
-    setLightbox((lb) =>
-      lb ? { ...lb, index: (lb.index + 1) % lb.images.length } : null
-    );
-
-  // Close on Escape / arrow keys
-  useEffect(() => {
-    if (!lightbox) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') prevImage();
-      if (e.key === 'ArrowRight') nextImage();
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [lightbox]);
 
   useEffect(() => {
     apiClient
@@ -188,189 +169,161 @@ export default function Story() {
 
       const firstEntry = entries[0];
       const lastEntry = entries[entries.length - 1];
+
+      // Select active track, progress line, beacon, and node selector for current viewport
+      const track = isMobile ? mobileTrackRef.current : desktopTrackRef.current;
+      const progressLine = isMobile ? mobileProgressRef.current : progressBarRef.current;
+      const beacon = isMobile ? mobileDotRef.current : travelingDotRef.current;
+      const nodeSelector = isMobile ? '.mobile-node' : '.desktop-node';
+
+      const firstNode = firstEntry.querySelector<HTMLElement>(nodeSelector);
+      const lastNode = lastEntry.querySelector<HTMLElement>(nodeSelector);
+
+      if (!track || !progressLine || !beacon || !firstNode || !lastNode) return;
+
       const areaRect = timelineAreaRef.current.getBoundingClientRect();
+      const firstRect = firstNode.getBoundingClientRect();
+      const lastRect = lastNode.getBoundingClientRect();
 
-      if (!isMobile) {
-        // ===== DESKTOP LOGIC (>= 1024px) =====
-        const firstDesktopNode = firstEntry.querySelector<HTMLElement>('.desktop-node');
-        const lastDesktopNode = lastEntry.querySelector<HTMLElement>('.desktop-node');
+      const topOffset = firstRect.top + firstRect.height / 2 - areaRect.top;
+      const leftOffset = firstRect.left + firstRect.width / 2 - areaRect.left;
+      const initialTrackHeight = Math.max(lastRect.top - firstRect.top, 60);
 
-        if (firstDesktopNode && lastDesktopNode && desktopTrackRef.current) {
-          const firstRect = firstDesktopNode.getBoundingClientRect();
-          const lastRect = lastDesktopNode.getBoundingClientRect();
-          const topOffset = firstRect.top + firstRect.height / 2 - areaRect.top;
-          const bottomOffset = lastRect.top + lastRect.height / 2 - areaRect.top;
-          const trackHeight = Math.max(bottomOffset - topOffset, 60);
+      // Align track origin precisely to the center of the first static node on both X and Y axes
+      track.style.left = `${leftOffset}px`;
+      track.style.top = `${topOffset}px`;
+      track.style.height = `${initialTrackHeight}px`;
 
-          desktopTrackRef.current.style.top = `${topOffset}px`;
-          desktopTrackRef.current.style.height = `${trackHeight}px`;
+      // Set hardware-accelerated initial transforms (centered on track origin)
+      gsap.set(beacon, { xPercent: -50, yPercent: -50, y: 0 });
+      gsap.set(progressLine, { scaleY: 0, transformOrigin: 'top center' });
 
-          if (progressBarRef.current) {
-            gsap.fromTo(
-              progressBarRef.current,
-              { scaleY: 0 },
-              {
-                scaleY: 1,
-                ease: 'none',
-                scrollTrigger: {
-                  trigger: firstDesktopNode,
-                  endTrigger: lastDesktopNode,
-                  start: 'center center',
-                  end: 'center center',
-                  scrub: 0.3,
-                },
-              }
-            );
-          }
+      // Pre-calculate exact threshold (0.0 to 1.0) for every milestone station
+      const nodeThresholds: { node: HTMLElement; threshold: number }[] = [];
+      const startY = firstRect.top + firstRect.height / 2;
+      const totalSpan = Math.max(lastRect.top + lastRect.height / 2 - startY, 1);
 
-          if (travelingDotRef.current) {
-            gsap.fromTo(
-              travelingDotRef.current,
-              { top: '0%' },
-              {
-                top: '100%',
-                ease: 'none',
-                scrollTrigger: {
-                  trigger: firstDesktopNode,
-                  endTrigger: lastDesktopNode,
-                  start: 'center center',
-                  end: 'center center',
-                  scrub: 0.3,
-                },
-              }
-            );
-          }
+      entries.forEach((entry) => {
+        const node = entry.querySelector<HTMLElement>(nodeSelector);
+        if (node) {
+          const nodeCenterY = node.getBoundingClientRect().top + node.getBoundingClientRect().height / 2;
+          const dist = nodeCenterY - startY;
+          const threshold = totalSpan > 0 ? Math.max(0, Math.min(1, dist / totalSpan)) : 0;
+          nodeThresholds.push({ node, threshold });
         }
-      } else {
-        // ===== MOBILE LOGIC (< 1024px) =====
-        const firstMobileNode = firstEntry.querySelector<HTMLElement>('.mobile-node');
-        const lastMobileNode = lastEntry.querySelector<HTMLElement>('.mobile-node');
+      });
 
-        if (firstMobileNode && lastMobileNode && mobileTrackRef.current) {
-          const firstRect = firstMobileNode.getBoundingClientRect();
-          const lastRect = lastMobileNode.getBoundingClientRect();
-          const topOffset = firstRect.top + firstRect.height / 2 - areaRect.top;
-          const bottomOffset = lastRect.top + lastRect.height / 2 - areaRect.top;
-          const trackHeight = Math.max(bottomOffset - topOffset, 60);
-
-          mobileTrackRef.current.style.top = `${topOffset}px`;
-          mobileTrackRef.current.style.height = `${trackHeight}px`;
-
-          if (mobileProgressRef.current) {
-            gsap.fromTo(
-              mobileProgressRef.current,
-              { scaleY: 0 },
-              {
-                scaleY: 1,
-                ease: 'none',
-                scrollTrigger: {
-                  trigger: firstMobileNode,
-                  endTrigger: lastMobileNode,
-                  start: 'center center',
-                  end: 'center center',
-                  scrub: 0.1,
-                },
-              }
-            );
+      // Synchronous Node Ignition: ignites node ONLY when the moving beacon has arrived at or passed it
+      const updateNodeStates = (p: number) => {
+        nodeThresholds.forEach(({ node, threshold }, i) => {
+          if (i === 0) {
+            // Initial static node is filled by default as the journey's starting station
+            node.classList.remove('node-empty');
+            node.classList.add('node-filled');
+            return;
           }
-
-          if (mobileDotRef.current) {
-            gsap.fromTo(
-              mobileDotRef.current,
-              { top: '0%' },
-              {
-                top: '100%',
-                ease: 'none',
-                scrollTrigger: {
-                  trigger: firstMobileNode,
-                  endTrigger: lastMobileNode,
-                  start: 'center center',
-                  end: 'center center',
-                  scrub: 0.1,
-                },
-              }
-            );
+          // Only fill when beacon has actually arrived at or passed this node's exact position!
+          if (p >= threshold) {
+            node.classList.remove('node-empty');
+            node.classList.add('node-filled');
+          } else {
+            node.classList.remove('node-filled');
+            node.classList.add('node-empty');
           }
+        });
+      };
+
+      // 1. Progress line expansion (starts strictly at 0 on initial scroll)
+      gsap.fromTo(
+        progressLine,
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: firstEntry,
+            endTrigger: lastNode,
+            start: isMobile ? 'top 25%' : 'top 30%',
+            end: isMobile ? 'center 45%' : 'center 45%',
+            scrub: true,
+          },
         }
-      }
+      );
 
-      // Per-entry entrance animations & node color fill
-      entries.forEach((entry, idx) => {
+      // 2. Beacon locomotion: starts concentric on first static node, moves down as user scrolls
+      gsap.fromTo(
+        beacon,
+        { y: 0 },
+        {
+          y: () => {
+            const f = firstNode.getBoundingClientRect();
+            const l = lastNode.getBoundingClientRect();
+            const h = Math.max(l.top - f.top, 60);
+            if (track) track.style.height = `${h}px`;
+            return h;
+          },
+          ease: 'none',
+          scrollTrigger: {
+            trigger: firstEntry,
+            endTrigger: lastNode,
+            start: isMobile ? 'top 25%' : 'top 30%',
+            end: isMobile ? 'center 45%' : 'center 45%',
+            scrub: true,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              updateNodeStates(self.progress);
+            },
+            onRefresh: (self) => {
+              updateNodeStates(self.progress);
+            },
+          },
+        }
+      );
+
+      // 3. Desktop Per-entry entrance animations & connector stems
+      entries.forEach((entry) => {
         const isEven = entry.classList.contains('even');
         const imgPanel = entry.querySelector('.desktop-view .entry-img');
         const textPanel = entry.querySelector('.desktop-view .entry-text');
         const connectorStem = entry.querySelector('.connector-stem');
-        const nodes = entry.querySelectorAll<HTMLElement>('.milestone-node');
 
-        // Desktop Text Entrance
         if (textPanel && !isMobile) {
           gsap.fromTo(
             textPanel,
-            { opacity: 0, x: isEven ? 40 : -40 },
+            { opacity: 0, x: isEven ? 35 : -35 },
             {
               opacity: 1,
               x: 0,
-              duration: 0.85,
-              ease: 'power3.out',
+              duration: 0.7,
+              ease: 'power2.out',
               scrollTrigger: {
                 trigger: entry,
-                start: 'top 85%',
+                start: 'top 88%',
                 toggleActions: 'play none none reverse',
               },
             }
           );
         }
 
-        // Desktop Image Entrance
         if (imgPanel && !isMobile) {
           gsap.fromTo(
             imgPanel,
-            { opacity: 0, x: isEven ? -40 : 40, scale: 0.97 },
+            { opacity: 0, x: isEven ? -35 : 35, scale: 0.98 },
             {
               opacity: 1,
               x: 0,
               scale: 1,
-              duration: 0.95,
-              ease: 'power3.out',
+              duration: 0.75,
+              ease: 'power2.out',
               scrollTrigger: {
                 trigger: entry,
-                start: 'top 85%',
+                start: 'top 88%',
                 toggleActions: 'play none none reverse',
               },
             }
           );
         }
 
-        // Synchronized Node Empty-to-Fill:
-        // Node 0 is the starting station (starts filled).
-        // Nodes 1..N trigger the moment the beacon arrives (top 52% on mobile, center center on desktop)!
-        if (idx > 0) {
-          nodes.forEach((node) => {
-            ScrollTrigger.create({
-              trigger: node,
-              start: isMobile ? 'top 52%' : 'center center',
-              onEnter: () => {
-                node.classList.remove('node-empty');
-                node.classList.add('node-filled');
-              },
-              onLeaveBack: () => {
-                node.classList.remove('node-filled');
-                node.classList.add('node-empty');
-              },
-              onRefresh: (self) => {
-                if (self.progress > 0) {
-                  node.classList.remove('node-empty');
-                  node.classList.add('node-filled');
-                } else {
-                  node.classList.remove('node-filled');
-                  node.classList.add('node-empty');
-                }
-              },
-            });
-          });
-        }
-
-        // Connector stem fill (Desktop)
         if (connectorStem && !isMobile) {
           const targetNode = entry.querySelector('.desktop-node');
           gsap.fromTo(
@@ -378,11 +331,11 @@ export default function Story() {
             { scaleX: 0, transformOrigin: isEven ? 'left center' : 'right center' },
             {
               scaleX: 1,
-              duration: 0.4,
+              duration: 0.35,
               ease: 'power2.out',
               scrollTrigger: {
                 trigger: targetNode || entry,
-                start: 'center center',
+                start: 'center 62%',
                 toggleActions: 'play reverse play reverse',
               },
             }
@@ -390,8 +343,21 @@ export default function Story() {
         }
       });
 
-      // Refresh ScrollTrigger to ensure dynamic layout heights are calibrated
+      // 4. Dynamic Content / Image Loading Defense (ResizeObserver)
+      let ro: ResizeObserver | null = null;
+      if (typeof ResizeObserver !== 'undefined' && timelineAreaRef.current) {
+        ro = new ResizeObserver(() => {
+          ScrollTrigger.refresh();
+        });
+        ro.observe(timelineAreaRef.current);
+      }
+
+      // Initial calibration refresh
       ScrollTrigger.refresh();
+
+      return () => {
+        if (ro) ro.disconnect();
+      };
     },
     { scope: pageRef, dependencies: [loading, timeline.length] }
   );
@@ -465,27 +431,26 @@ export default function Story() {
               {/* DESKTOP TIMELINE TRACK: Starts AT First Node, Ends AT Last Node */}
               <div
                 ref={desktopTrackRef}
-                className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 lg:block"
-                style={{ top: '0px', height: '100%' }}
+                className="pointer-events-none absolute hidden lg:block"
+                style={{ top: '0px', height: '100%', left: '50%' }}
               >
                 {/* Background track line */}
-                <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-[var(--brown)]/10" />
+                <div className="absolute left-0 top-0 h-full w-[2px] -translate-x-1/2 bg-[var(--brown)]/10" />
 
                 {/* Ambient glow groove */}
-                <div className="absolute left-1/2 top-0 h-full w-24 -translate-x-1/2 bg-gradient-to-r from-transparent via-[var(--gold)]/[0.04] to-transparent" />
+                <div className="absolute left-0 top-0 h-full w-24 -translate-x-1/2 bg-gradient-to-r from-transparent via-[var(--gold)]/[0.04] to-transparent" />
 
                 {/* Progress bar */}
                 <div
                   ref={progressBarRef}
                   style={{ transformOrigin: 'top center' }}
-                  className="absolute left-1/2 top-0 h-full w-[2.5px] -translate-x-1/2 origin-top bg-gradient-to-b from-[var(--gold)] via-[var(--gold-light)] to-[var(--gold)] drop-shadow-[0_0_8px_rgba(200,150,42,0.5)]"
+                  className="absolute left-0 top-0 h-full w-[2.5px] -translate-x-1/2 origin-top bg-gradient-to-b from-[var(--gold)] via-[var(--gold-light)] to-[var(--gold)] drop-shadow-[0_0_8px_rgba(200,150,42,0.5)] will-change-transform"
                 />
 
-                {/* Traveling beacon (Starts on first node!) */}
+                {/* Traveling beacon (GPU animated) */}
                 <div
                   ref={travelingDotRef}
-                  className="absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
-                  style={{ top: '0%' }}
+                  className="absolute left-0 top-0 z-20 will-change-transform"
                 >
                   <div className="relative flex items-center justify-center">
                     <span className="absolute inline-flex h-7 w-7 animate-ping rounded-full bg-[var(--gold-light)] opacity-60" />
@@ -512,14 +477,13 @@ export default function Story() {
                 <div
                   ref={mobileProgressRef}
                   style={{ transformOrigin: 'top center' }}
-                  className="absolute left-0 top-0 h-full w-[2px] -translate-x-1/2 origin-top bg-gradient-to-b from-[var(--gold)] via-[var(--gold-light)] to-[var(--gold)] drop-shadow-[0_0_8px_rgba(200,150,42,0.5)]"
+                  className="absolute left-0 top-0 h-full w-[2px] -translate-x-1/2 origin-top bg-gradient-to-b from-[var(--gold)] via-[var(--gold-light)] to-[var(--gold)] drop-shadow-[0_0_8px_rgba(200,150,42,0.5)] will-change-transform"
                 />
 
-                {/* Mobile traveling beacon (Starts on first node!) */}
+                {/* Mobile traveling beacon (GPU animated) */}
                 <div
                   ref={mobileDotRef}
-                  className="absolute left-0 z-20 -translate-x-1/2 -translate-y-1/2"
-                  style={{ top: '0%' }}
+                  className="absolute left-0 top-0 z-20 will-change-transform"
                 >
                   <div className="relative flex items-center justify-center">
                     <span className="absolute inline-flex h-6 w-6 animate-ping rounded-full bg-[var(--gold-light)] opacity-60" />
@@ -670,88 +634,16 @@ export default function Story() {
         )}
       </main>
 
-      {/* ===== LIGHTBOX MODAL ===== */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90 backdrop-blur-md"
-          onClick={closeLightbox}
-        >
-          {/* Close */}
-          <button
-            onClick={closeLightbox}
-            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
-
-          {/* Counter */}
-          <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 backdrop-blur-sm">
-            {lightbox.index + 1} / {lightbox.images.length}
-          </div>
-
-          {/* Prev */}
-          {lightbox.images.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                prevImage();
-              }}
-              className="absolute left-3 top-1/2 z-10 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20 sm:left-6"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-          )}
-
-          {/* Image */}
-          <div
-            className="relative mx-16 max-h-[85vh] max-w-4xl w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={lightbox.images[lightbox.index]}
-              alt=""
-              className="h-full max-h-[85vh] w-full rounded-2xl object-contain shadow-2xl"
-            />
-          </div>
-
-          {/* Next */}
-          {lightbox.images.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                nextImage();
-              }}
-              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20 sm:right-6"
-              aria-label="Next"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-          )}
-
-          {/* Thumbnail strip */}
-          {lightbox.images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 rounded-2xl bg-black/40 p-2 backdrop-blur-sm">
-              {lightbox.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLightbox((lb) => (lb ? { ...lb, index: idx } : null));
-                  }}
-                  className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${idx === lightbox.index
-                      ? 'border-[var(--gold)] opacity-100 scale-105'
-                      : 'border-transparent opacity-50 hover:opacity-80'
-                    }`}
-                >
-                  <img src={img} alt="" className="h-full w-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {/* ===== UNIVERSAL REUSABLE LIGHTBOX MODAL WITH MOBILE TOUCH SWIPE ===== */}
+      <LightboxModal
+        isOpen={!!lightbox}
+        images={lightbox?.images || []}
+        currentIndex={lightbox?.index || 0}
+        onClose={closeLightbox}
+        onIndexChange={(newIndex) =>
+          setLightbox((lb) => (lb ? { ...lb, index: newIndex } : null))
+        }
+      />
     </div>
   );
 }

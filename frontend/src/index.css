@@ -301,6 +301,15 @@ h6 {
   background: var(--brown-light);
 }
 
+/* Hide scrollbar for clean carousels and filmstrips */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Back to top button */
 .back-to-top {
   position: fixed;

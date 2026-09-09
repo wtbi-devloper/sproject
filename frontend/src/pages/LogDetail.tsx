@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, NavLink } from 'react-router-dom';
 import apiClient from '../api/client';
 import OptimizedImage from '../components/OptimizedImage';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import LightboxModal from '../components/LightboxModal';
+import { ChevronLeft } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -87,78 +88,6 @@ function formatBody(text: string): React.ReactNode[] {
   return elements;
 }
 
-function Lightbox({
-  images,
-  currentIndex,
-  onClose,
-  onNext,
-  onPrev,
-}: {
-  images: string[];
-  currentIndex: number;
-  onClose: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-}) {
-  return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
-      onClick={onClose}
-    >
-      <button 
-        className="absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors z-10"
-        onClick={onClose}
-      >
-        <X className="h-6 w-6" />
-      </button>
-      
-      {images.length > 1 && (
-        <>
-          <button 
-            className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); onPrev(); }}
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button 
-            className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors z-10"
-            onClick={(e) => { e.stopPropagation(); onNext(); }}
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
-        </>
-      )}
-      
-      <div onClick={(e) => e.stopPropagation()} className="relative max-h-[85vh] max-w-5xl w-full flex items-center justify-center">
-        <img
-          key={`lb-${currentIndex}`}
-          src={images[currentIndex]}
-          alt=""
-          className="max-h-[85vh] max-w-full rounded-2xl object-contain shadow-2xl"
-        />
-      </div>
-      
-      {images.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 bg-black/40 p-2 rounded-2xl backdrop-blur-sm">
-          {images.map((img, index) => (
-            <div
-              key={index}
-              className={`h-12 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                index === currentIndex ? 'border-[var(--gold)] opacity-100 scale-105' : 'border-transparent opacity-50 hover:opacity-80'
-              }`}
-            >
-              <img src={img} alt="" className="h-full w-full object-cover" />
-            </div>
-          ))}
-        </div>
-      )}
-      
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80 backdrop-blur-sm">
-        {currentIndex + 1} / {images.length}
-      </div>
-    </div>
-  );
-}
 
 export default function LogDetail() {
   const { id } = useParams<{ id: string }>();
@@ -197,18 +126,6 @@ export default function LogDetail() {
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [id]);
-
-  // Handle lightbox keyboard nav
-  useEffect(() => {
-    if (!lightboxOpen || !log || !log.images) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightboxOpen(false);
-      if (e.key === 'ArrowLeft') setCurrentIndex((prev) => (prev - 1 + log.images!.length) % log.images!.length);
-      if (e.key === 'ArrowRight') setCurrentIndex((prev) => (prev + 1) % log.images!.length);
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [lightboxOpen, log]);
 
   // Mobile scroll animation for the image
   useEffect(() => {
@@ -401,16 +318,16 @@ export default function LogDetail() {
         )}
       </div>
 
-      {/* Lightbox Modal */}
-      {lightboxOpen && log.images && (
-        <Lightbox
-          images={log.images}
-          currentIndex={currentIndex}
-          onClose={() => setLightboxOpen(false)}
-          onNext={() => setCurrentIndex((prev) => (prev + 1) % log.images!.length)}
-          onPrev={() => setCurrentIndex((prev) => (prev - 1 + log.images!.length) % log.images!.length)}
-        />
-      )}
+      {/* Universal Reusable Lightbox Modal */}
+      <LightboxModal
+        isOpen={lightboxOpen && !!log?.images && log.images.length > 0}
+        images={log?.images || []}
+        imageBlurUrls={log?.imageBlurUrls}
+        currentIndex={currentIndex}
+        onClose={() => setLightboxOpen(false)}
+        onIndexChange={setCurrentIndex}
+        title={log?.title}
+      />
     </div>
   );
 }
