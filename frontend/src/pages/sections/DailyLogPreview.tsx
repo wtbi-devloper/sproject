@@ -125,7 +125,7 @@ export default function DailyLogPreview() {
         <div className="relative mt-8 lg:mt-0 pl-6 lg:pl-[max(1.5rem,calc((100vw-80rem)/2))] pr-8">
           <div ref={trackRef} className="flex flex-row items-stretch gap-6 lg:gap-8 px-0 w-max">
             {items.map((log) => (
-              <div key={log._id} className="log-card-wrapper">
+              <div key={log._id} className="log-card-wrapper shrink-0">
                 <LogEntry
                   id={log._id}
                   date={new Date(log.date).toLocaleDateString('en-US', {

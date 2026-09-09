@@ -1,27 +1,22 @@
 import ContactForm from '../components/ContactForm';
-import { ArrowLeft } from 'lucide-react';
 import useSocialLinks from '../hooks/useSocialLinks';
 
 export default function Connect() {
   const { socialButtons, loading } = useSocialLinks();
 
   return (
-    <div className="min-h-screen bg-[var(--brown)]">
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:py-24">
-        {/* Back */}
-        <a
-          href="/"
-          className="group inline-flex items-center gap-2 rounded-xl border border-[var(--cream)]/15 px-4 py-2 text-sm font-medium text-[var(--cream)] transition hover:border-[var(--gold)] hover:text-[var(--gold)]"
-        >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          Back to Home
-        </a>
+    <div className="min-h-screen bg-[var(--brown)] pt-24 sm:pt-28 lg:pt-32 pb-20 lg:pb-28 relative overflow-hidden">
+      {/* Subtle background ambient decoration */}
+      <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full bg-[var(--gold)]/5 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full bg-[var(--gold)]/3 blur-3xl" />
 
-        <div className="mt-8">
-          <div className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
+      <div className="relative mx-auto max-w-7xl px-6">
+        <div>
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
+            <span className="inline-block h-px w-6 bg-[var(--gold)]" />
             Connect
           </div>
-          <h1 className="mt-4 font-['Playfair_Display'] text-4xl font-bold tracking-tight text-[var(--cream)] sm:text-5xl">
+          <h1 className="mt-3 font-['Playfair_Display'] text-3xl font-bold tracking-tight text-[var(--cream)] sm:text-4xl">
             Let's Work Together{' '}
             <span className="text-[var(--gold)]">+</span>
             {' '}Create Together{' '}

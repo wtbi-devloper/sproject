@@ -3,7 +3,8 @@ import { useParams, NavLink } from 'react-router-dom';
 import apiClient from '../api/client';
 import OptimizedImage from '../components/OptimizedImage';
 import LightboxModal from '../components/LightboxModal';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Clock, Maximize2 } from 'lucide-react';
+import { calculateReadingTime } from '../utils/readingTime';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -202,12 +203,12 @@ export default function LogDetail() {
       {/* Left Side: Sticky Image Area (only if hasImage) */}
       {hasImage && (
         <div ref={mobileContainerRef} className="w-full lg:w-1/2 lg:sticky lg:top-0 lg:h-screen lg:pt-[100px] lg:px-12 lg:pb-12 flex flex-col items-center justify-center">
-          <div ref={mobileImageRef} className="relative w-full h-[45vh] sm:h-[55vh] lg:h-full max-h-[800px] bg-[var(--brown)] overflow-hidden lg:rounded-3xl lg:shadow-2xl origin-top">
+          <div ref={mobileImageRef} className="group relative w-full h-[45vh] sm:h-[55vh] lg:h-full max-h-[800px] bg-[var(--brown)] overflow-hidden lg:rounded-3xl lg:shadow-2xl origin-top cursor-pointer">
             {/* Back button (Desktop) */}
             <div className="hidden lg:block absolute top-6 left-6 z-30">
               <NavLink 
                 to="/page/daily-log" 
-                className="flex items-center gap-2 rounded-full bg-black/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-black/40 shadow-sm"
+                className="flex items-center gap-2 rounded-full bg-black/30 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition-all duration-200 hover:bg-black/50 hover:scale-105 shadow-sm ring-1 ring-white/10"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Back to Logs
@@ -223,41 +224,49 @@ export default function LogDetail() {
               loading="eager"
               fetchPriority="high"
               className="h-full"
-              imgClassName="w-full h-full object-cover transition-transform duration-1000 hover:scale-105 cursor-pointer opacity-85"
+              imgClassName="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-90 group-hover:opacity-100"
             />
-          <div 
-            className="absolute inset-0 cursor-pointer" 
-            onClick={() => { setLightboxOpen(true); setCurrentIndex(autoIndex); }} 
-          />
+            <div 
+              className="absolute inset-0 z-10" 
+              onClick={() => { setLightboxOpen(true); setCurrentIndex(autoIndex); }} 
+            />
           
-          {/* Subtle gradient for aesthetics */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-black/20" />
+            {/* Subtle gradient for aesthetics */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-black/30" />
 
-          {/* Corner Thumbnails */}
-          {log.images!.length > 1 && (
-            <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10 z-20 flex gap-2">
-              {Array.from({ length: Math.min(3, log.images!.length - 1) }).map((_, j) => {
-                const idx = (autoIndex + j + 1) % log.images!.length;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => { setLightboxOpen(true); setCurrentIndex(idx); }}
-                    className="h-14 w-20 sm:h-16 sm:w-24 lg:h-20 lg:w-28 overflow-hidden rounded-xl border-2 border-white/20 shadow-xl transition-all hover:scale-105 hover:border-white/60"
-                  >
-                    <OptimizedImage src={log.images![idx]} blurSrc={log.imageBlurUrls?.[idx]} alt="" fit="cover" loading="lazy" className="h-full" imgClassName="h-full w-full object-cover" />
-                  </button>
-                );
-              })}
-              {log.images!.length > 4 && (
-                <button
-                  onClick={() => { setLightboxOpen(true); setCurrentIndex((autoIndex + 4) % log.images!.length); }}
-                  className="flex h-14 w-20 sm:h-16 sm:w-24 lg:h-20 lg:w-28 items-center justify-center rounded-xl border-2 border-white/20 bg-black/50 text-sm font-bold text-white shadow-xl backdrop-blur-sm transition-colors hover:bg-black/70 hover:border-white/60"
-                >
-                  +{log.images!.length - 4}
-                </button>
-              )}
+            {/* Floating "Click to expand" chip */}
+            <div className="pointer-events-none absolute bottom-6 left-6 z-20 hidden sm:inline-flex items-center gap-2 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/20 shadow-xl transition-all duration-300 group-hover:translate-y-0 translate-y-2 opacity-80 group-hover:opacity-100">
+              <Maximize2 className="h-3.5 w-3.5 text-[var(--gold)]" />
+              <span>Expand Photo</span>
             </div>
-          )}
+
+            {/* Corner Thumbnails */}
+            {log.images!.length > 1 && (
+              <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10 z-20 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                {Array.from({ length: Math.min(3, log.images!.length - 1) }).map((_, j) => {
+                  const idx = (autoIndex + j + 1) % log.images!.length;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => { setLightboxOpen(true); setCurrentIndex(idx); }}
+                      className="h-14 w-20 sm:h-16 sm:w-24 lg:h-20 lg:w-28 overflow-hidden rounded-xl border-2 border-white/20 shadow-xl transition-all duration-300 hover:scale-105 hover:border-[var(--gold)]"
+                      aria-label={`View photo ${idx + 1}`}
+                    >
+                      <OptimizedImage src={log.images![idx]} blurSrc={log.imageBlurUrls?.[idx]} alt="" fit="cover" loading="lazy" className="h-full" imgClassName="h-full w-full object-cover" />
+                    </button>
+                  );
+                })}
+                {log.images!.length > 4 && (
+                  <button
+                    onClick={() => { setLightboxOpen(true); setCurrentIndex((autoIndex + 4) % log.images!.length); }}
+                    className="flex h-14 w-20 sm:h-16 sm:w-24 lg:h-20 lg:w-28 items-center justify-center rounded-xl border-2 border-white/20 bg-black/50 text-sm font-bold text-white shadow-xl backdrop-blur-sm transition-all duration-300 hover:bg-black/70 hover:scale-105 hover:border-[var(--gold)]"
+                    aria-label="View more photos"
+                  >
+                    +{log.images!.length - 4}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -287,9 +296,16 @@ export default function LogDetail() {
           <h1 className="font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--brown)] mb-6 leading-tight">
             {log.title}
           </h1>
-          <p className="text-base sm:text-lg text-[var(--muted)] font-medium tracking-wide">
-            {formattedDate}
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-base sm:text-lg text-[var(--muted)] font-medium tracking-wide">
+              {formattedDate}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-[var(--brown)]/20" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1 text-xs font-semibold text-[var(--gold)] border border-[var(--gold)]/25 shadow-xs backdrop-blur-sm">
+              <Clock className="h-3.5 w-3.5 text-[var(--gold)]" />
+              {calculateReadingTime(log.body)}
+            </span>
+          </div>
         </div>
 
         {/* Body Content */}

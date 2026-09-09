@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import OptimizedImage from './OptimizedImage';
+import { calculateReadingTime } from '../utils/readingTime';
+import { Clock } from 'lucide-react';
 
 interface LogEntryProps {
   id?: string;
@@ -12,6 +14,7 @@ interface LogEntryProps {
   imageBlurUrls?: string[];
   readMoreLink?: string;
   variant?: 'list' | 'card';
+  showReadingTime?: boolean;
 }
 
 function formatBody(text: string): React.ReactNode[] {
@@ -97,12 +100,15 @@ export default function LogEntry({
   imageBlurUrls,
   readMoreLink,
   variant = 'list',
+  showReadingTime = false,
 }: LogEntryProps) {
   const isLong = body.length > 200;
   const displayBody = isLong ? body.slice(0, 200) + '...' : body;
   
   // Link to detail page if id is provided, otherwise use readMoreLink
   const detailLink = id ? `/page/daily-log/${id}` : readMoreLink;
+
+  const readingTime = calculateReadingTime(body);
 
   if (variant === 'card') {
     const cardContent = (
@@ -115,11 +121,38 @@ export default function LogEntry({
               alt=""
               fit="cover"
               loading="lazy"
-              imgClassName="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              imgClassName="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
+
+            {/* Reading Time Badge */}
+            {showReadingTime && (
+              <div className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white/95 backdrop-blur-md ring-1 ring-white/15 shadow-md">
+                <Clock className="h-3 w-3 text-[var(--gold)]" />
+                <span>{readingTime}</span>
+              </div>
+            )}
+
+            {/* Category / Tag Pill */}
+            {tags && tags.length > 0 && (
+              <div className="absolute top-4 left-4 z-10 inline-flex items-center rounded-full bg-black/60 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--gold-light)] backdrop-blur-md ring-1 ring-white/15 shadow-md">
+                #{tags[0]}
+              </div>
+            )}
           </div>
         ) : (
-          <div className="aspect-[4/3] w-full shrink-0 rounded-t-[2rem] bg-[var(--cream)]" />
+          <div className="relative aspect-[4/3] w-full shrink-0 rounded-t-[2rem] bg-[var(--cream)] overflow-hidden">
+            {showReadingTime && (
+              <div className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-[var(--brown-light)] shadow-xs ring-1 ring-black/5">
+                <Clock className="h-3 w-3 text-[var(--gold)]" />
+                <span>{readingTime}</span>
+              </div>
+            )}
+            {tags && tags.length > 0 && (
+              <div className="absolute top-4 left-4 z-10 inline-flex items-center rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--gold)] shadow-xs ring-1 ring-black/5">
+                #{tags[0]}
+              </div>
+            )}
+          </div>
         )}
         
         <div className="flex flex-grow flex-col justify-center p-6 sm:p-8">

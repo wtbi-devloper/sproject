@@ -374,29 +374,19 @@ export default function Story() {
         <div className="absolute top-[70%] left-[8%] h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-[var(--gold)]/8 via-[var(--card-bg)]/40 to-transparent blur-3xl" />
       </div>
 
-      {/* ===== BESPOKE HERO HEADER (UNIFIED WITH FULL PAGE BG) ===== */}
+      {/* ===== BESPOKE HERO HEADER ===== */}
       <section className="relative z-10 mx-auto max-w-6xl px-6 pb-8 pt-24 sm:pb-12 sm:pt-28 lg:pt-32">
-        <div className="flex flex-col items-start text-left">
-          {/* <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1.5 text-xs font-black uppercase tracking-[0.24em] text-[var(--gold)] shadow-sm backdrop-blur-md ring-1 ring-[var(--gold)]/20">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--gold)] opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--gold)]"></span>
-            </span>
-            Archival Journey
-          </div> */}
-
-          <div className="flex w-full flex-wrap items-end justify-between gap-x-8 gap-y-4">
-            <div>
-              <h1 className="font-['Playfair_Display'] text-4xl font-bold tracking-tight text-[var(--brown)] sm:text-5xl lg:text-6xl">
-                The Journey <span className="italic text-[var(--gold-light)]">So Far.</span>
-              </h1>
-            </div>
-            <p className="max-w-md text-base leading-relaxed text-[var(--muted)] font-medium">
-              An evolving narrative of pivotal milestones, defining chapters, and the continuous
-              pursuit of purposeful work.
-            </p>
+        <div className="flex flex-col items-start text-left max-w-3xl">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[var(--gold)]">
+            <span className="inline-block h-px w-6 bg-[var(--gold)]" />
+            Our Story
           </div>
-
+          <h1 className="mt-4 font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--brown)]">
+            The Journey <span className="italic text-[var(--gold-light)]">So Far.</span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-base sm:text-lg leading-relaxed text-[var(--muted)] font-medium">
+            An evolving narrative of pivotal milestones, defining chapters, and the continuous pursuit of purposeful work.
+          </p>
           <div className="mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-[var(--gold)] via-[var(--gold-light)] to-transparent" />
         </div>
       </section>
