@@ -269,7 +269,7 @@ export default function HeroSection() {
       </div>
 
       {/* 2. TOP CENTER (Mobile) / TOP RIGHT (Desktop): True Scroll-Driven Typewriter */}
-      <div className="absolute top-20 sm:top-24 left-1/2 z-20 w-[90%] max-w-[340px] -translate-x-1/2 text-center lg:left-auto lg:right-24 lg:top-32 lg:w-[420px] lg:translate-x-0 lg:text-left xl:w-[500px]">
+      <div className="absolute top-28 min-[380px]:top-32 sm:top-32 left-1/2 z-20 w-[90%] max-w-[340px] -translate-x-1/2 text-center lg:left-auto lg:right-24 lg:top-32 lg:w-[420px] lg:translate-x-0 lg:text-left xl:w-[500px]">
         <p className="font-['Playfair_Display'] text-xl leading-snug text-white sm:text-3xl lg:text-4xl">
           {HERO_DESCRIPTION.split("").map((char, i) => (
             <span key={i} className="hero-desc-char hidden">
