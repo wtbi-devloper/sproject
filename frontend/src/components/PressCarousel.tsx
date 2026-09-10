@@ -6,6 +6,7 @@ import {
 } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Newspaper, ArrowUpRight } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -15,6 +16,9 @@ import OptimizedImage from './OptimizedImage';
 export interface PressItem {
   _id: string;
   outlet: string;
+  outletLogo?: string;
+  outletLogoBlurUrl?: string;
+  mediaType?: string;
   title: string;
   year: string;
   link?: string;
@@ -48,60 +52,124 @@ function mod(n: number, m: number) {
 function PressCardContent({ item, isCenter, onClick }: { item: PressItem; isCenter: boolean; onClick?: (e: React.MouseEvent) => void }) {
   const href = item.link || item.url;
   const image = item.images?.[0];
+  const mediaType = item.mediaType || 'Newspaper';
 
   return (
     <div
-      className={`group flex flex-col overflow-hidden rounded-[28px] transition-all duration-300 ease-out h-full ${isCenter ? 'hover:-translate-y-2 hover:shadow-2xl' : ''}`}
+      className={`group flex flex-col overflow-hidden rounded-[26px] border border-[var(--gold)]/20 transition-all duration-300 ease-out h-full select-none ${
+        isCenter ? 'hover:-translate-y-2 hover:shadow-2xl' : ''
+      }`}
       onClick={(e) => {
         if (onClick) onClick(e);
         else if (href) window.open(href, '_blank', 'noopener,noreferrer');
       }}
       style={{
-        backgroundColor: 'var(--card-bg)',
+        backgroundColor: '#FFFFFF',
         cursor: href && isCenter ? 'pointer' : 'default',
-        boxShadow: '0 8px 20px -8px rgba(44,26,14,0.15)',
+        boxShadow: isCenter
+          ? '0 20px 40px -15px rgba(44,26,14,0.18), 0 0 0 1px rgba(200,150,42,0.15)'
+          : '0 8px 24px -10px rgba(44,26,14,0.12)',
       }}
     >
-      <div className="relative w-full aspect-[4/3] overflow-hidden shrink-0">
+      {/* 1. Masthead Header: Top-Left Year + Media Format, Top-Right Logo/Badge, and Full Outlet Title */}
+      <div className="flex flex-col gap-2 px-5 py-3.5 sm:px-6 sm:py-4 bg-[#FAF8F5] border-b border-[var(--brown)]/8">
+        {/* Top row: Format pill on left, Logo or 'Press Coverage' on top right */}
+        <div className="flex items-center justify-between gap-3 min-h-[44px]">
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-black uppercase tracking-wider shrink-0"
+            style={{
+              backgroundColor: 'rgba(200,150,42,0.12)',
+              color: 'var(--gold)',
+              border: '1px solid rgba(200,150,42,0.25)',
+            }}
+          >
+            <Newspaper className="h-3 w-3 shrink-0" />
+            <span>{item.year} · {mediaType}</span>
+          </span>
+
+          {/* Top-Right: Logo if available, else 'Press Coverage' text */}
+          {item.outletLogo ? (
+            <div className="h-10 sm:h-12 max-w-[150px] sm:max-w-[180px] flex items-center justify-end shrink-0">
+              <img
+                src={item.outletLogo}
+                alt={item.outlet}
+                className="max-h-10 sm:max-h-12 max-w-full object-contain object-right pointer-events-none drop-shadow-xs"
+              />
+            </div>
+          ) : (
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)]/60 shrink-0">
+              Press Coverage
+            </span>
+          )}
+        </div>
+
+        {/* Outlet Title row: Always visible, full text with no clipping */}
+        <div className="flex items-center min-h-[26px]">
+          <h4
+            className="font-['Playfair_Display'] font-black text-sm sm:text-base tracking-wide uppercase text-[var(--brown)] leading-snug break-words"
+            title={item.outlet}
+          >
+            {item.outlet}
+          </h4>
+        </div>
+      </div>
+
+      {/* 2. Newspaper Clipping Preview Frame */}
+      <div className="relative w-full aspect-[16/10] overflow-hidden shrink-0 bg-[#F5F2EA] border-b border-[var(--brown)]/6">
         {image ? (
-          <OptimizedImage
-            src={image}
-            blurSrc={item.imageBlurUrls?.[0]}
-            alt={`${item.outlet} — ${item.title}`}
-            fit="cover"
-            loading={isCenter ? 'eager' : 'lazy'}
-            fetchPriority={isCenter ? 'high' : undefined}
-            className="h-full w-full"
-            imgClassName="h-full w-full pointer-events-none select-none"
-          />
+          <>
+            <OptimizedImage
+              src={image}
+              blurSrc={item.imageBlurUrls?.[0]}
+              alt={`${item.outlet} — ${item.title}`}
+              fit="cover"
+              loading={isCenter ? 'eager' : 'lazy'}
+              fetchPriority={isCenter ? 'high' : undefined}
+              className="block h-full w-full"
+              imgClassName="block h-full w-full pointer-events-none select-none transition-transform duration-700 group-hover:scale-105 object-cover"
+            />
+            {/* Subtle newsprint inner shadow vignette */}
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_15px_rgba(44,26,14,0.12)]" />
+          </>
         ) : (
-          <div
-            className="h-full w-full"
-            style={{ background: 'linear-gradient(135deg, var(--cream), var(--card-bg))' }}
-          />
+          <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-[#F5F2EA] via-[#EFECE3] to-[#F5F2EA]">
+            <Newspaper className="h-10 w-10 text-[var(--gold)]/40 mb-2" />
+            <span className="text-xs font-bold uppercase tracking-widest text-[var(--brown)]/50">
+              Editorial Feature
+            </span>
+          </div>
         )}
       </div>
 
-      <div className="px-6 py-6 sm:px-7 sm:py-7 flex flex-col gap-3 flex-1 bg-[var(--card-bg)]">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>
-            {item.outlet}
-          </span>
-          <span className="text-xs" style={{ color: 'var(--muted)' }}>
-            {item.year}
-          </span>
+      {/* 3. Headline & Meta */}
+      <div className="px-5 py-4 sm:px-6 sm:py-5 flex flex-col justify-between flex-1 bg-white gap-3">
+        <div>
+          <h3
+            className="font-bold leading-snug transition-colors duration-200 group-hover:text-[var(--gold)] line-clamp-2 sm:line-clamp-3"
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 'clamp(1rem, 0.95rem + 0.5vw, 1.25rem)',
+              color: 'var(--brown)',
+            }}
+            title={item.title}
+          >
+            {item.title}
+          </h3>
         </div>
 
-        <h3
-          className="font-bold leading-snug"
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(1.1rem, 1rem + 1vw, 1.5rem)',
-            color: 'var(--brown)',
-          }}
-        >
-          {item.title}
-        </h3>
+        {/* 4. Action Footer */}
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[var(--brown)]/6 text-xs">
+          <span
+            className="flex-1 min-w-0 text-[11.5px] font-semibold text-[var(--muted)] truncate"
+            title={item.outlet}
+          >
+            {item.outlet}
+          </span>
+          <span className="inline-flex items-center gap-1 font-bold text-[var(--gold)] group-hover:translate-x-1 transition-transform shrink-0">
+            Read Article
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -56,20 +56,68 @@ export const THOUGHT_IMAGES = [
   makePlaceholder('t5', GRADIENTS[2].from, GRADIENTS[2].to, '\u{2728}', 'Vision'),
 ];
 
-export const PRESS_IMAGES = [
-  makePlaceholder('p1', GRADIENTS[8].from, GRADIENTS[8].to, '\u{1F4F0}', 'Featured'),
-  makePlaceholder('p2', GRADIENTS[5].from, GRADIENTS[5].to, '\u{1F3A5}', 'Interview'),
-  makePlaceholder('p3', GRADIENTS[6].from, GRADIENTS[6].to, '\u{1F50A}', 'Coverage'),
-  makePlaceholder('p4', GRADIENTS[9].from, GRADIENTS[9].to, '\u{1F3E2}', 'Profile'),
-  makePlaceholder('p5', GRADIENTS[7].from, GRADIENTS[7].to, '\u{1F3C6}', 'Recognition'),
-];
+function makePressClipping(outlet: string, type: string, headline: string): string {
+  return svgDataUri(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">` +
+      `<rect width="800" height="500" fill="#F6F4ED"/>` +
+      `<rect x="24" y="20" width="752" height="460" fill="#FFFFFF" stroke="#E2DCD0" stroke-width="1.5" rx="6"/>` +
+      `<line x1="44" y1="64" x2="756" y2="64" stroke="#2C1A0E" stroke-width="2.5"/>` +
+      `<text x="400" y="54" text-anchor="middle" font-family="'Times New Roman', serif" font-size="22" font-weight="900" letter-spacing="3" fill="#2C1A0E">${outlet.toUpperCase()}</text>` +
+      `<line x1="44" y1="70" x2="756" y2="70" stroke="#2C1A0E" stroke-width="1"/>` +
+      `<text x="400" y="86" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" letter-spacing="1.5" fill="#8C7A6B">${type.toUpperCase()} EDITION • ARCHIVAL MEDIA FEATURE</text>` +
+      `<line x1="44" y1="96" x2="756" y2="96" stroke="#EAE5DB" stroke-width="1"/>` +
+      `<text x="400" y="132" text-anchor="middle" font-family="'Times New Roman', serif" font-size="20" font-weight="bold" fill="#1C130B">${headline.slice(0, 44)}...</text>` +
+      `<rect x="44" y="152" width="220" height="150" fill="#EAE5DB" rx="4"/>` +
+      `<rect x="44" y="152" width="220" height="150" fill="none" stroke="#D5CEC0" stroke-width="1"/>` +
+      `<line x1="284" y1="162" x2="756" y2="162" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="284" y1="184" x2="756" y2="184" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="284" y1="206" x2="756" y2="206" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="284" y1="228" x2="756" y2="228" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="284" y1="250" x2="756" y2="250" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="284" y1="272" x2="756" y2="272" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="284" y1="294" x2="660" y2="294" stroke="#DCD5C7" stroke-width="7"/>` +
+      `<line x1="44" y1="330" x2="264" y2="330" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="44" y1="350" x2="264" y2="350" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="44" y1="370" x2="264" y2="370" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="44" y1="390" x2="220" y2="390" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="290" y1="330" x2="510" y2="330" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="290" y1="350" x2="510" y2="350" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="290" y1="370" x2="510" y2="370" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="290" y1="390" x2="470" y2="390" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="536" y1="330" x2="756" y2="330" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="536" y1="350" x2="756" y2="350" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="536" y1="370" x2="756" y2="370" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<line x1="536" y1="390" x2="710" y2="390" stroke="#E6E0D4" stroke-width="5"/>` +
+      `<rect x="330" y="426" width="140" height="28" fill="#FAF8F3" stroke="#C8962A" stroke-width="1.5" rx="4"/>` +
+      `<text x="400" y="445" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="900" letter-spacing="2" fill="#C8962A">PRESS ARCHIVE</text>` +
+    `</svg>`
+  );
+}
 
-export const ACHIEVEMENT_IMAGES = [
-  makePlaceholder('a1', GRADIENTS[0].from, GRADIENTS[0].to, '\u{1F3C6}', 'Award'),
-  makePlaceholder('a2', GRADIENTS[4].from, GRADIENTS[4].to, '\u{1F3AF}', 'Goal Reached'),
-  makePlaceholder('a3', GRADIENTS[2].from, GRADIENTS[2].to, '\u{1F4AA}', 'Strength'),
-  makePlaceholder('a4', GRADIENTS[3].from, GRADIENTS[3].to, '\u{2B50}', 'Excellence'),
-  makePlaceholder('a5', GRADIENTS[1].from, GRADIENTS[1].to, '\u{1F31F}', 'Shining'),
+function makeOutletLogo(name: string, isSquare = false): string {
+  if (isSquare) {
+    return svgDataUri(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">` +
+        `<rect width="80" height="80" rx="14" fill="#2C1A0E"/>` +
+        `<rect x="4" y="4" width="72" height="72" rx="10" fill="none" stroke="#C8962A" stroke-width="2"/>` +
+        `<text x="40" y="49" text-anchor="middle" font-family="'Times New Roman', serif" font-size="26" font-weight="900" fill="#FFFFFF">${name.slice(0, 2).toUpperCase()}</text>` +
+      `</svg>`
+    );
+  }
+  return svgDataUri(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="60" viewBox="0 0 240 60">` +
+      `<text x="8" y="38" font-family="Playfair Display, Georgia, serif" font-size="22" font-weight="900" letter-spacing="1.5" fill="#2C1A0E">${name}</text>` +
+      `<line x1="8" y1="46" x2="230" y2="46" stroke="#C8962A" stroke-width="1.5" opacity="0.7"/>` +
+    `</svg>`
+  );
+}
+
+export const PRESS_IMAGES = [
+  makePressClipping('The Daily Chronicle', 'Newspaper', 'Salman Shariff: Changing Lives Through Philanthropy'),
+  makePressClipping('Impact Magazine', 'Magazine', 'Top 40 Under 40 Social Innovators to Watch'),
+  makePressClipping('Prajavani News', 'Newspaper', 'How Purpose-Driven Startups Are Reshaping India'),
+  makePressClipping('Youth Voice Radio', 'Broadcast', 'Interview: Building a Generation of Believers'),
+  makePressClipping('National Herald', 'Newspaper', 'Community Champion Award — Recognizing Impact'),
 ];
 
 export const DEMO_STORY = [
@@ -92,11 +140,64 @@ export const DEMO_THOUGHTS = [
 ];
 
 export const DEMO_PRESS = [
-  { _id: 'demo-p1', outlet: 'The Daily Chronicle', title: 'Salman Shariff: The Entrepreneur Changing Lives Through Philanthropy', year: '2025', images: [PRESS_IMAGES[0]] },
-  { _id: 'demo-p2', outlet: 'Impact Magazine', title: 'Top 40 Under 40 Social Innovators to Watch', year: '2024', images: [PRESS_IMAGES[1]] },
-  { _id: 'demo-p3', outlet: 'Business Herald', title: 'How Purpose-Driven Startups Are Reshaping India', year: '2024', images: [PRESS_IMAGES[2]] },
-  { _id: 'demo-p4', outlet: 'Youth Voice Radio', title: 'Interview: Building a Generation of Believers and Leaders', year: '2023', images: [PRESS_IMAGES[3]] },
-  { _id: 'demo-p5', outlet: 'National Herald', title: 'Community Champion Award — Recognizing Grassroots Impact', year: '2023', images: [PRESS_IMAGES[4]] },
+  {
+    _id: 'demo-p1',
+    outlet: 'The Daily Chronicle',
+    outletLogo: makeOutletLogo('Daily Chronicle'),
+    mediaType: 'Newspaper',
+    title: 'Salman Shariff: The Entrepreneur Changing Lives Through Philanthropy',
+    year: '2025',
+    url: 'https://example.com/daily-chronicle',
+    images: [PRESS_IMAGES[0]],
+  },
+  {
+    _id: 'demo-p2',
+    outlet: 'Impact Magazine',
+    outletLogo: makeOutletLogo('Impact', true), // Square logo test
+    mediaType: 'Magazine',
+    title: 'Top 40 Under 40 Social Innovators to Watch Across the Region',
+    year: '2024',
+    url: 'https://example.com/impact-magazine',
+    images: [PRESS_IMAGES[1]],
+  },
+  {
+    _id: 'demo-p3',
+    outlet: 'Prajavani News',
+    // No logo: tests full text outlet name without any "Prajava..." truncation!
+    mediaType: 'Newspaper',
+    title: 'How Purpose-Driven Startups Are Reshaping India’s Social Fabric',
+    year: '2024',
+    url: 'https://example.com/prajavani',
+    images: [PRESS_IMAGES[2]],
+  },
+  {
+    _id: 'demo-p4',
+    outlet: 'Youth Voice Online',
+    outletLogo: makeOutletLogo('Youth Voice'),
+    mediaType: 'Online Article',
+    title: 'Exclusive Interview: Building a Generation of Believers and Leaders',
+    year: '2023',
+    url: 'https://example.com/youth-voice',
+    images: [PRESS_IMAGES[3]],
+  },
+  {
+    _id: 'demo-p5',
+    outlet: 'National Herald',
+    outletLogo: makeOutletLogo('NH', true), // Square logo test
+    mediaType: 'Newspaper',
+    title: 'Community Champion Award — Recognizing Grassroots Groundwork',
+    year: '2023',
+    url: 'https://example.com/national-herald',
+    images: [PRESS_IMAGES[4]],
+  },
+];
+
+export const ACHIEVEMENT_IMAGES = [
+  makePlaceholder('a1', GRADIENTS[0].from, GRADIENTS[0].to, '\u{1F3C6}', 'Award'),
+  makePlaceholder('a2', GRADIENTS[4].from, GRADIENTS[4].to, '\u{1F3AF}', 'Goal Reached'),
+  makePlaceholder('a3', GRADIENTS[2].from, GRADIENTS[2].to, '\u{1F4AA}', 'Strength'),
+  makePlaceholder('a4', GRADIENTS[3].from, GRADIENTS[3].to, '\u{2B50}', 'Excellence'),
+  makePlaceholder('a5', GRADIENTS[1].from, GRADIENTS[1].to, '\u{1F31F}', 'Shining'),
 ];
 
 export const DEMO_ACHIEVEMENTS = [

@@ -43,13 +43,16 @@ export async function getPressById(req: Request, res: Response, next: NextFuncti
 
 export async function createPress(req: Request, res: Response, next: NextFunction) {
   try {
-    const { outlet, title, year, url, order, images, imageBlurUrls, isOptimized } = req.body;
+    const { outlet, outletLogo, outletLogoBlurUrl, mediaType, title, year, url, order, images, imageBlurUrls, isOptimized } = req.body;
     if (!outlet || !title || !year) {
       res.status(400).json({ success: false, error: 'Outlet, title, and year are required' });
       return;
     }
     const item = await PressItem.create({
       outlet,
+      outletLogo: outletLogo || '',
+      outletLogoBlurUrl: outletLogoBlurUrl || '',
+      mediaType: mediaType || 'Newspaper',
       title,
       year,
       url,
@@ -88,7 +91,12 @@ export async function deletePress(req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    await deleteGalleryAndBlurFromR2(item.images, item.imageBlurUrls, isR2Url);
+    const imagesToDelete = [...(item.images || [])];
+    const blursToDelete = [...(item.imageBlurUrls || [])];
+    if (item.outletLogo) imagesToDelete.push(item.outletLogo);
+    if (item.outletLogoBlurUrl) blursToDelete.push(item.outletLogoBlurUrl);
+
+    await deleteGalleryAndBlurFromR2(imagesToDelete, blursToDelete, isR2Url);
 
     await PressItem.findByIdAndDelete(req.params.id);
     res.json({ success: true, data: null });

@@ -46,7 +46,7 @@ function useDebounce<T>(value: T, delay: number): T {
 interface TimelineEntry { _id: string; year: string; title: string; description: string; images?: string[]; imageBlurUrls?: string[]; }
 interface LogItem { _id: string; date: string; title: string; body: string; tags: string[]; published: boolean; images: string[]; imageBlurUrls?: string[]; isOptimized?: boolean; }
 interface Thought { _id: string; topic: string; title: string; summary: string; published: boolean; images: string[]; imageBlurUrls?: string[]; isOptimized?: boolean; }
-interface PressItem { _id: string; outlet: string; title: string; year: string; url: string; images: string[]; imageBlurUrls?: string[]; isOptimized?: boolean; }
+interface PressItem { _id: string; outlet: string; outletLogo?: string; outletLogoBlurUrl?: string; mediaType?: string; title: string; year: string; url: string; images: string[]; imageBlurUrls?: string[]; isOptimized?: boolean; }
 interface Achievement { _id: string; icon: string; title: string; description: string; year: string; images: string[]; imageBlurUrls?: string[]; isOptimized?: boolean; }
 interface SocialLinks { whatsapp: string; instagram: string; linkedin: string; twitter: string; facebook: string; email: string; }
 interface ContactEntry { _id: string; name: string; email: string; message: string; read: boolean; submittedAt: string; }
@@ -128,6 +128,7 @@ function ImageUploader({
   folder: _folder,
   aspectRatio,
   maxImages,
+  label = 'Attached Imagery',
 }: {
   images: string[];
   imageBlurUrls?: string[];
@@ -135,6 +136,7 @@ function ImageUploader({
   folder: string;
   aspectRatio?: number;
   maxImages?: number;
+  label?: string;
 }) {
   const [uploading, setUploading] = useState(false);
   const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -223,7 +225,7 @@ function ImageUploader({
   return (
     <div className="block group">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">Attached Imagery</span>
+        <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted)]">{label}</span>
         {uploading && (
           <span className="flex items-center gap-1.5 text-xs font-bold text-[var(--gold)]">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -807,6 +809,9 @@ function PressManager({ searchQuery }: { searchQuery: string }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     outlet: '',
+    outletLogo: '',
+    outletLogoBlurUrl: '',
+    mediaType: 'Newspaper',
     title: '',
     year: '',
     url: '',
@@ -815,13 +820,23 @@ function PressManager({ searchQuery }: { searchQuery: string }) {
   });
   const debouncedSearch = useDebounce(searchQuery, 400);
 
-  useEffect(() => { apiClient.get('/press', { params: { search: debouncedSearch } }).then((r) => setItems(extractData(r))).catch(() => {}); }, [debouncedSearch]);
+  const MEDIA_TYPES = ['Newspaper', 'Magazine', 'Online Article', 'Broadcast / Video', 'Interview', 'Other'];
+
+  useEffect(() => {
+    apiClient
+      .get('/press', { params: { search: debouncedSearch } })
+      .then((r) => setItems(extractData(r)))
+      .catch(() => {});
+  }, [debouncedSearch]);
 
   const openForm = (item?: PressItem) => {
     if (item) {
       setEditingId(item._id);
       setForm({
         outlet: item.outlet,
+        outletLogo: item.outletLogo || '',
+        outletLogoBlurUrl: item.outletLogoBlurUrl || '',
+        mediaType: item.mediaType || 'Newspaper',
         title: item.title,
         year: item.year,
         url: item.url,
@@ -830,73 +845,224 @@ function PressManager({ searchQuery }: { searchQuery: string }) {
       });
     } else {
       setEditingId(null);
-      setForm({ outlet: '', title: '', year: '', url: '', images: [], imageBlurUrls: [] });
+      setForm({
+        outlet: '',
+        outletLogo: '',
+        outletLogoBlurUrl: '',
+        mediaType: 'Newspaper',
+        title: '',
+        year: new Date().getFullYear().toString(),
+        url: '',
+        images: [],
+        imageBlurUrls: [],
+      });
     }
     setModalOpen(true);
   };
 
   const save = async () => {
-    if (!form.title || !form.outlet) return;
-    const payload = { ...form, isOptimized: galleryLooksFullyOptimized(form.images) };
+    if (!form.title || !form.outlet) {
+      alert('Please fill in both the Publisher Name and Article Headline.');
+      return;
+    }
+    const finalYear = form.year || new Date().getFullYear().toString();
+    const payload = { ...form, year: finalYear, isOptimized: galleryLooksFullyOptimized(form.images) };
     try {
       if (editingId) {
         const r = await apiClient.put(`/press/${editingId}`, payload);
-        setItems(items.map(i => i._id === editingId ? extractData(r) : i));
+        setItems(items.map((i) => (i._id === editingId ? extractData(r) : i)));
       } else {
         const r = await apiClient.post('/press', payload);
         setItems([extractData(r), ...items]);
       }
       setModalOpen(false);
-    } catch (err) { console.error(err); }
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.error || 'Failed to save press mention. Please check your connection or inputs.');
+    }
   };
 
-  const remove = async (id: string) => { try { await apiClient.delete(`/press/${id}`); setItems(items.filter((i) => i._id !== id)); } catch (err) { console.error(err); } };
+  const remove = async (id: string) => {
+    try {
+      await apiClient.delete(`/press/${id}`);
+      setItems(items.filter((i) => i._id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <>
-      <Panel title="External Mentions" description="Manage news syndication and public routing." action={<Btn onClick={() => openForm()} icon={Plus}>Catalog Mention</Btn>}>
+      <Panel
+        title="Press & Media Citations"
+        description="Manage newspaper clippings, publication logos, and public media references."
+        action={<Btn onClick={() => openForm()} icon={Plus}>Catalog Media Mention</Btn>}
+      >
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {items.map(p => (
-            <div key={p._id} className="group flex flex-col justify-between relative rounded-3xl border-2 border-[var(--brown)]/5 bg-white p-6 shadow-sm transition hover:border-[var(--gold)]/20 hover:shadow-xl hover:-translate-y-1">
+          {items.map((p) => (
+            <div
+              key={p._id}
+              className="group flex flex-col justify-between relative rounded-3xl border-2 border-[var(--brown)]/5 bg-white p-6 shadow-sm transition hover:border-[var(--gold)]/20 hover:shadow-xl hover:-translate-y-1"
+            >
               <div>
-                <h4 className="text-sm font-black uppercase tracking-widest text-[var(--gold)] mb-3">{p.outlet} · {p.year}</h4>
-                <p className="text-lg font-bold text-[var(--brown)] leading-snug">{p.title}</p>
-                {p.images?.length > 0 && <span className="mt-3 flex items-center gap-1 text-[var(--gold)] text-xs font-bold"><ImagePlus className="h-4 w-4" /> Media Attached ({p.images.length})</span>}
+                {/* Top row: Format/Year on left, Logo on top-right */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[var(--gold)]/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-[var(--gold)] shrink-0">
+                    {p.year} · {p.mediaType || 'Newspaper'}
+                  </span>
+
+                  {p.outletLogo ? (
+                    <div className="h-8 max-w-[130px] flex items-center justify-end shrink-0">
+                      <img src={p.outletLogo} alt={p.outlet} className="max-h-8 max-w-full object-contain object-right" />
+                    </div>
+                  ) : (
+                    <span className="text-[10px] font-bold text-[var(--muted)]/50 uppercase">Press</span>
+                  )}
+                </div>
+
+                {/* Outlet Name */}
+                <h4 className="font-['Playfair_Display'] text-sm font-black uppercase tracking-wide text-[var(--brown)] mb-2">
+                  {p.outlet}
+                </h4>
+
+                <p className="text-base font-bold text-[var(--brown)] leading-snug line-clamp-2">
+                  {p.title}
+                </p>
+
+                {/* Clipping Scan Preview */}
+                {p.images && p.images.length > 0 && (
+                  <div className="mt-3 relative h-28 w-full overflow-hidden rounded-xl border border-[var(--brown)]/10 bg-[var(--cream)]/40">
+                    <img src={p.images[0]} alt="" className="h-full w-full object-cover" />
+                    <span className="absolute bottom-1.5 right-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider">
+                      Clipping Attached
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="mt-8 flex gap-2">
-                 {p.url && <a href={p.url} target="_blank" rel="noreferrer" className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--warm-white)] px-3 py-2 text-xs font-bold text-[var(--brown)] hover:bg-[var(--gold)]/10 hover:text-[var(--gold)] transition"><ExternalLink className="h-3.5 w-3.5" /> View Hit</a>}
-                 <Btn onClick={() => openForm(p)} variant="secondary" icon={Edit2} />
-                 <Btn onClick={() => remove(p._id)} variant="danger" icon={Trash2} />
+
+              <div className="mt-6 flex gap-2">
+                {p.url && (
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--warm-white)] px-3 py-2 text-xs font-bold text-[var(--brown)] hover:bg-[var(--gold)]/10 hover:text-[var(--gold)] transition"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> View Link
+                  </a>
+                )}
+                <Btn onClick={() => openForm(p)} variant="secondary" icon={Edit2} />
+                <Btn onClick={() => remove(p._id)} variant="danger" icon={Trash2} />
               </div>
             </div>
           ))}
         </div>
       </Panel>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? "Revert Press Citation" : "Inject Media Reference"}>
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={editingId ? 'Edit Press Feature' : 'Add Media Coverage / Press Clipping'}
+      >
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            <FormInput label="Publisher Identity" value={form.outlet} onChange={(v) => setForm({ ...form, outlet: v })} placeholder="Forbes, WSJ, etc." />
-            <FormInput label="Publication Year" value={form.year} onChange={(v) => setForm({ ...form, year: v })} placeholder="2026" />
+            <FormInput
+              label="Publisher / News Outlet Name"
+              value={form.outlet}
+              onChange={(v) => setForm({ ...form, outlet: v })}
+              placeholder="e.g. The Hindu, Times of India, Forbes"
+            />
+            <FormInput
+              label="Publication Year / Date"
+              value={form.year}
+              onChange={(v) => setForm({ ...form, year: v })}
+              placeholder="e.g. 2025"
+            />
+
+            {/* Media Type Selector */}
             <div className="md:col-span-2">
-              <FormInput label="Headline / Anchor Text" value={form.title} onChange={(v) => setForm({ ...form, title: v })} placeholder="Is this the future..." />
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--muted)] mb-2">
+                Media Format / Type
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {MEDIA_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setForm({ ...form, mediaType: type })}
+                    className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition ${
+                      form.mediaType === type
+                        ? 'bg-[var(--gold)] text-white shadow-sm'
+                        : 'bg-[var(--warm-white)] text-[var(--brown)] hover:bg-[var(--cream)]'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <FormInput
+                label="Article Headline"
+                value={form.title}
+                onChange={(v) => setForm({ ...form, title: v })}
+                placeholder="e.g. Salman Shariff: Changing Lives Through Philanthropy"
+              />
             </div>
             <div className="md:col-span-2">
-              <FormInput label="Direct URL Path" value={form.url} onChange={(v) => setForm({ ...form, url: v })} placeholder="https://..." />
+              <FormInput
+                label="Direct Web URL (Optional)"
+                value={form.url}
+                onChange={(v) => setForm({ ...form, url: v })}
+                placeholder="https://..."
+              />
             </div>
           </div>
 
-          <ImageUploader
-            images={form.images}
-            imageBlurUrls={form.imageBlurUrls}
-            onChange={(imgs, blurs) => setForm({ ...form, images: imgs, imageBlurUrls: blurs })}
-            folder="press"
-            maxImages={1}
-          />
+          {/* Publication Logo Uploader */}
+          <div className="rounded-2xl border border-[var(--brown)]/10 bg-[var(--warm-white)]/50 p-4">
+            <ImageUploader
+              label="1. News Outlet / Publisher Logo (e.g. The Hindu, TOI logo)"
+              images={form.outletLogo ? [form.outletLogo] : []}
+              imageBlurUrls={form.outletLogoBlurUrl ? [form.outletLogoBlurUrl] : []}
+              onChange={(imgs, blurs) =>
+                setForm({
+                  ...form,
+                  outletLogo: imgs[0] || '',
+                  outletLogoBlurUrl: blurs[0] || '',
+                })
+              }
+              folder="press-logos"
+              maxImages={1}
+            />
+            <p className="mt-2 text-[11px] text-[var(--muted)]">
+              Upload the official publication logo (PNG/SVG/WebP). If omitted, an elegant typography masthead will be used.
+            </p>
+          </div>
+
+          {/* Newspaper Clipping / Article Scan */}
+          <div className="rounded-2xl border border-[var(--brown)]/10 bg-[var(--warm-white)]/50 p-4">
+            <ImageUploader
+              label="2. Newspaper Clipping / Article Scan (Full scan or photo of newspaper)"
+              images={form.images}
+              imageBlurUrls={form.imageBlurUrls}
+              onChange={(imgs, blurs) => setForm({ ...form, images: imgs, imageBlurUrls: blurs })}
+              folder="press"
+              maxImages={1}
+            />
+            <p className="mt-2 text-[11px] text-[var(--muted)]">
+              Upload the scanned newspaper clipping, magazine page, or article screenshot.
+            </p>
+          </div>
 
           <div className="flex justify-end gap-3 pt-6 border-t border-[var(--brown)]/5">
-            <Btn onClick={() => setModalOpen(false)} variant="ghost">Halt Function</Btn>
-            <Btn onClick={save} icon={editingId ? Edit2 : Plus}>{editingId ? 'Modify Schema' : 'Engage Link'}</Btn>
+            <Btn onClick={() => setModalOpen(false)} variant="ghost">
+              Cancel
+            </Btn>
+            <Btn onClick={save} icon={editingId ? Edit2 : Plus}>
+              {editingId ? 'Save Changes' : 'Publish Coverage'}
+            </Btn>
           </div>
         </div>
       </Modal>

@@ -2,6 +2,9 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IPressItem extends Document {
   outlet: string;
+  outletLogo?: string;
+  outletLogoBlurUrl?: string;
+  mediaType?: string;
   title: string;
   year: string;
   url: string;
@@ -14,6 +17,9 @@ export interface IPressItem extends Document {
 const PressItemSchema = new Schema<IPressItem>(
   {
     outlet: { type: String, required: true },
+    outletLogo: { type: String, default: '' },
+    outletLogoBlurUrl: { type: String, default: '' },
+    mediaType: { type: String, default: 'Newspaper' },
     title: { type: String, required: true },
     year: { type: String, required: true },
     url: { type: String, default: '' },

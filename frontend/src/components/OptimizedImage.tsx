@@ -45,7 +45,7 @@ export default function OptimizedImage({
       <img
         src={src}
         alt={alt}
-        className={`${imgClassName} ${fitClass}`.trim()}
+        className={`block ${imgClassName} ${fitClass}`.trim()}
         loading={loading}
         {...commonImgProps}
       />
