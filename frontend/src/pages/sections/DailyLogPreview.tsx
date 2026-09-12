@@ -36,13 +36,14 @@ export default function DailyLogPreview() {
       .finally(() => setLoading(false));
   }, []);
 
+  // FIX 8: Reduced from 10 → 6 cards — preview should tease, not replace the full page
   const items: LogItem[] =
     logs.length > 0
-      ? logs.slice(0, 10).map((log, i) => ({
+      ? logs.slice(0, 6).map((log, i) => ({
         ...log,
         images: log.images && log.images.length > 0 ? log.images : [LOG_IMAGES[i % LOG_IMAGES.length]],
       }))
-      : (DEMO_LOGS as LogItem[]).slice(0, 10);
+      : (DEMO_LOGS as LogItem[]).slice(0, 6);
 
   useGSAP(() => {
     if (loading || items.length === 0) return;
@@ -104,6 +105,10 @@ export default function DailyLogPreview() {
             <h2 className="mt-3 font-['Playfair_Display'] text-3xl font-bold tracking-tight text-[var(--brown)] sm:text-4xl lg:text-5xl">
               What's Happening
             </h2>
+            {/* FIX 10: Scroll hint micro-label */}
+            <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--muted)]/60">
+              ← Scroll to explore →
+            </p>
           </div>
           <NavLink
             to="/page/daily-log"
@@ -122,6 +127,7 @@ export default function DailyLogPreview() {
           ))}
         </div>
       ) : (
+        /* FIX 9 REMOVED: Right-edge gradient removed per user request */
         <div className="relative mt-8 lg:mt-0 pl-6 lg:pl-[max(1.5rem,calc((100vw-80rem)/2))] pr-8">
           <div ref={trackRef} className="flex flex-row items-stretch gap-6 lg:gap-8 px-0 w-max">
             {items.map((log) => (
@@ -164,6 +170,7 @@ export default function DailyLogPreview() {
 
         </div>
       )}
+
     </section>
   );
 }

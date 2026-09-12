@@ -14,10 +14,12 @@ export default function Footer() {
   useMotionValueEvent(scrollY, 'change', (latest) => {
     const previous = scrollY.getPrevious() || 0;
     const isScrollingUp = latest < previous;
-    
-    // Only show the button if past 400px AND the user is scrolling up
-    const shouldShow = latest > 400 && isScrollingUp;
-    
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+    // FIX 16: Show when scrolling up past 400px, OR when user is at bottom 20% of page
+    const isNearBottom = docHeight > 0 && latest > docHeight * 0.8;
+    const shouldShow = latest > 400 && (isScrollingUp || isNearBottom);
+
     if (showBackToTop !== shouldShow) {
       setShowBackToTop(shouldShow);
     }

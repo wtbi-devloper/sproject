@@ -35,7 +35,8 @@ interface PressCarouselProps {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const AUTO_ROTATE_MS = 3000;
+// FIX 11: Increased from 3000ms → 5000ms so users have time to read card titles
+const AUTO_ROTATE_MS = 5000;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers

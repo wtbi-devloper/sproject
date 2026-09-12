@@ -15,14 +15,15 @@ export default function ConnectPreview() {
           <span className="inline-block h-px w-6 bg-[var(--gold)]" />
           Connect
         </div>
+        {/* FIX 13: Rewrote heading — removes math-equation format, cleaner rhythm */}
         <h2 className="mt-3 font-['Playfair_Display'] text-3xl font-bold tracking-tight text-[var(--cream)] sm:text-4xl">
-          Let's Work Together{' '}
-          <span className="text-[var(--gold)]">+</span>
-          {' '}Create Together{' '}
-          <span className="text-[var(--gold)]">+</span>
-          {' '}Grow Together{' '}
-          <span className="text-[var(--gold)]">=</span>
-          {' '}SUCCESS
+          Work Together
+          <span className="text-[var(--gold)]"> · </span>
+          Create Together
+          <span className="text-[var(--gold)]"> · </span>
+          Grow Together
+          <br />
+          <span className="text-[var(--gold)] italic">— That's how we build SUCCESS.</span>
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--cream)]/70">
           Whether it's a project, partnership, or just a conversation — I'd love to hear from you.
@@ -60,8 +61,8 @@ export default function ConnectPreview() {
             )}
           </div>
 
-          {/* Contact Form */}
-          <div>
+          {/* FIX 14: Contact form gets a subtle card lift — makes it the primary CTA visually */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6 backdrop-blur-sm">
             <h3 className="mb-4 text-sm font-semibold text-[var(--cream)]">Send a Message</h3>
             <ContactForm />
           </div>
