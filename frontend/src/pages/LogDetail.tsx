@@ -132,9 +132,9 @@ export default function LogDetail() {
   useEffect(() => {
     if (!log?.images || log.images.length === 0 || !mobileContainerRef.current || !mobileImageRef.current) return;
 
-    let ctx = gsap.context(() => {
+    const ctx = gsap.context(() => {
       // Only apply on screens smaller than 1024px (lg breakpoint)
-      let mm = gsap.matchMedia();
+      const mm = gsap.matchMedia();
       
       mm.add("(max-width: 1023px)", () => {
         gsap.to(mobileImageRef.current, {

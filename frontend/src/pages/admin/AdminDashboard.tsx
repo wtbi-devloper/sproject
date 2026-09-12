@@ -124,7 +124,6 @@ function ImageUploader({
   images,
   imageBlurUrls,
   onChange,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   folder: _folder,
   aspectRatio,
   maxImages,
@@ -876,9 +875,10 @@ function PressManager({ searchQuery }: { searchQuery: string }) {
         setItems([extractData(r), ...items]);
       }
       setModalOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      alert(err.response?.data?.error || 'Failed to save press mention. Please check your connection or inputs.');
+      const message = err instanceof Error ? err.message : 'Failed to save press mention. Please check your connection or inputs.';
+      alert(message);
     }
   };
 

@@ -61,9 +61,10 @@ export default function HeroSection() {
   // Immediate check in case video is cached or already ready (or no video URL configured)
   useEffect(() => {
     if (videoUrl === '') {
-      setIsVideoLoaded(true);
+      // Defer state update to avoid synchronous setState in effect
+      setTimeout(() => setIsVideoLoaded(true), 0);
     } else if (videoRef.current && videoRef.current.readyState >= 2) {
-      setIsVideoLoaded(true);
+      setTimeout(() => setIsVideoLoaded(true), 0);
     }
   }, [videoUrl]);
 

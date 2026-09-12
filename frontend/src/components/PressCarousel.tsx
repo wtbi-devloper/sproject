@@ -3,6 +3,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  type MutableRefObject,
 } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -180,7 +181,15 @@ function PressCardContent({ item, isCenter, onClick }: { item: PressItem; isCent
 // Desktop 3D Carousel (Framer Motion)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function DesktopCarousel({ items, activeIdx, navigate, jumpTo, isDraggingRef, draggedFarRef, isMobile }: any) {
+function DesktopCarousel({ items, activeIdx, navigate, jumpTo, isDraggingRef, draggedFarRef, isMobile }: {
+  items: PressItem[];
+  activeIdx: number;
+  navigate: (dir: 'next' | 'prev') => void;
+  jumpTo: (realIdx: number) => void;
+  isDraggingRef: MutableRefObject<boolean>;
+  draggedFarRef: MutableRefObject<boolean>;
+  isMobile: boolean;
+}) {
   const count = items.length;
   const dragStartXRef = useRef(0);
   const clickStartRef = useRef({ x: 0, y: 0, time: 0 });
@@ -314,13 +323,17 @@ export default function PressCarousel({ items }: PressCarouselProps) {
   const isFocusedRef = useRef(false);
   const isDraggingRef = useRef(false);
 
-  const lastAdvanceRef = useRef<number>(Date.now());
+  const lastAdvanceRef = useRef<number>(0);
+  // Initialize with current time after mount to avoid impure function in render
+  useEffect(() => {
+    lastAdvanceRef.current = Date.now();
+  }, []);
   const draggedFarRef = useRef(false);
 
   // Handle responsive architecture
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 768px)');
-    setIsDesktop(mq.matches);
+    setTimeout(() => setIsDesktop(mq.matches), 0);
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);

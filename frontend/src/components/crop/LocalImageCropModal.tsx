@@ -70,7 +70,7 @@ const LocalImageCropModal: React.FC<LocalImageCropModalProps> = ({
     }
   }, [files, activeIndex]);
 
-  const handleMarkProcessed = (data: Blob | File) => {
+  const handleMarkProcessed = useCallback((data: Blob | File) => {
     setProcessedFiles(prev => {
       const next = { ...prev, [activeIndex]: data };
       const nextUnprocessed = files?.findIndex((_, i) => !next[i]);
@@ -79,7 +79,7 @@ const LocalImageCropModal: React.FC<LocalImageCropModalProps> = ({
       }
       return next;
     });
-  };
+  }, [activeIndex, files]);
 
   const handleCrop = useCallback(() => {
     if (!cropperRef.current) return;
@@ -101,7 +101,7 @@ const LocalImageCropModal: React.FC<LocalImageCropModalProps> = ({
       setError('Failed to crop the image.');
       setIsProcessing(false);
     }
-  }, [outputMimeType, activeIndex, files, handleMarkProcessed]);
+  }, [outputMimeType, handleMarkProcessed]);
 
   const handleSkip = () => {
     if (files && files[activeIndex]) {

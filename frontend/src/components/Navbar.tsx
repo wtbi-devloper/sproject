@@ -38,7 +38,9 @@ export default function Navbar() {
       setScrolled((event as CustomEvent<{ isLight: boolean }>).detail.isLight);
     };
 
-    setScrolled(document.documentElement.dataset.heroNavbarTheme === 'light');
+    setTimeout(() => {
+      setScrolled(document.documentElement.dataset.heroNavbarTheme === 'light');
+    }, 0);
     window.addEventListener('hero-theme-change', handleHeroThemeChange);
     return () => window.removeEventListener('hero-theme-change', handleHeroThemeChange);
   }, [isHome]);
